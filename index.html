@@ -15,6 +15,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <title>אפרתושקה: מסיבת הקסם</title>
 <link rel="icon" href="assets/img/icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/img/icon-180.png">
+<meta name="apple-mobile-web-app-title" content="אפרתושקה">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -42,6 +46,11 @@
     <div id="chalBanner" class="chal hidden"></div>
     <div id="holiBanner" class="holi hidden"></div>
     <div class="menuBottom">
+      <div class="minis">
+        <button class="mini" id="tChamps"><svg viewBox="0 0 32 32" width="22" height="22"><path d="M9 4h14v6a7 7 0 0 1-14 0z" fill="#ffd23f" stroke="#e69500" stroke-width="2"/><path d="M9 7H4a5 5 0 0 0 6 6M23 7h5a5 5 0 0 1-6 6" fill="none" stroke="#e69500" stroke-width="2"/><rect x="14" y="16" width="4" height="6" fill="#e69500"/><rect x="9" y="22" width="14" height="5" rx="2" fill="#a35cff"/></svg><span>אלופי השבוע</span></button>
+        <button class="mini" id="tCode"><svg viewBox="0 0 32 32" width="22" height="22"><path d="M3 9h26v4a3 3 0 0 0 0 6v4H3v-4a3 3 0 0 0 0-6z" fill="#ff6fc8" stroke="#c2187a" stroke-width="2"/><path d="M16 11l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#fff59a"/></svg><span>קוד הפתעה</span></button>
+        <button class="mini hidden" id="tInstall"><svg viewBox="0 0 32 32" width="22" height="22"><rect x="8" y="2" width="16" height="28" rx="4" fill="#3fd4ff" stroke="#1a8fc0" stroke-width="2"/><path d="M16 9v10m-4-4 4 4 4-4" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg><span>הוסיפו למסך הבית</span></button>
+      </div>
       <div class="tiles">
         <button class="tile" id="tMissions"><img src="assets/v2/wd_starlamp.webp" alt=""><span>משימות</span><i class="dot hidden"></i></button>
         <button class="tile" id="tJourney"><img src="assets/v2/wd_rocket.webp" alt=""><span>מסע הכוכבים</span><i class="dot hidden"></i></button>
@@ -117,6 +126,7 @@
       <div class="pill pw hidden" id="hudPower"></div>
       <div class="goldbar" id="goldBar" title="קדחת זהב"><i id="goldFill"></i></div>
     </div>
+    <div id="ixBox" class="ixbox hidden"><div id="ixTxt" class="ixtxt"></div><button id="ixBtn" class="ixbtn" aria-label="הקישו"></button></div>
     <button id="btnRide" class="ridebtn hidden" aria-label="רכב קסם"><img id="rideImg" alt=""><span>×2 הקשה</span></button>
     <div class="prog"><div class="track"><i id="progFill"></i><b id="progThief">🦝</b><b id="progGirl">👧</b></div></div>
     <div id="bdayTag" class="bdaytag hidden"></div>
@@ -264,7 +274,7 @@
         <label class="btn mid purple filebtn">🖼 מהגלריה<input type="file" id="pfGal" accept="image/*"></label>
       </div>
       <p class="privacy">🔒 התמונה נשארת רק במכשיר שלכם</p>
-      <label class="chk"><input type="checkbox" id="pfBuddy" checked> החבר/ה שלי רץ/ה לצד אפרתושקה</label>
+      <label class="chk"><input type="checkbox" id="pfBuddy" checked> התמונה שלי מקשטת את המסלול ביום הולדת</label>
       <button id="pfSave" class="btn big pink">שמירה ✔</button>
       <div class="row"><button id="pfDel" class="btn mid gray">🗑 מחיקת התמונה</button><button id="pfBack" class="btn mid gray">⬅ חזרה</button></div>
     </div>
@@ -299,8 +309,55 @@
       </select>
       <div class="lbl">פרטיות</div>
       <p class="ptext">אין במשחק פרסומות, קניות בכסף אמיתי או מעקב. כל ההתקדמות והתמונה נשמרות רק בדפדפן במכשיר הזה. קישורי שיתוף כוללים רק שם וגיל/ניקוד – אף פעם לא תמונה.</p>
+      <div id="parSocial" class="hidden"><div class="lbl">אפרתושקה ברשתות</div><div id="parSocialRow" class="row wrap"></div><a id="parBook" class="btn mid green hidden" target="_blank" rel="noopener noreferrer">הזמנת מופע בוואטסאפ</a></div>
       <div class="row"><button id="parDelPhoto" class="btn mid gray">🗑 מחיקת התמונה</button><button id="parReset" class="btn mid gray">איפוס התקדמות</button></div>
       <button class="btn mid gray back" data-back>⬅ חזרה למשחק</button>
+    </div>
+  </section>
+
+  <!-- CHAMPIONS -->
+  <section id="scrChamps" class="screen panelscr">
+    <div class="panel wide">
+      <h2>🏆 אלופי השבוע</h2>
+      <div id="chDemo" class="note hidden">מצב הדגמה – הטבלה הארצית תופעל בקרוב. השמות כאן לדוגמה.</div>
+      <div id="chTabs" class="chips"></div>
+      <div id="chList" class="chlist"></div>
+      <div id="chMe" class="sub"></div>
+      <button id="chJoin" class="btn mid purple">✨ הצטרפות לטבלה (הורים)</button>
+      <p class="ptext">רק כינוי מופיע בטבלה – בלי תמונות, בלי שמות מלאים ובלי פרטים אישיים.</p>
+      <button id="chBack" class="btn mid gray back">⬅ חזרה</button>
+    </div>
+  </section>
+  <section id="scrNick" class="screen panelscr">
+    <div class="panel">
+      <h2>בחירת כינוי לטבלה</h2>
+      <p class="ptext">כינוי בלבד (לא שם מלא), 2–14 אותיות, בלי מספרים.</p>
+      <input id="nkIn" class="txt" maxlength="14" autocomplete="off" dir="rtl">
+      <div id="nkMsg" class="errmsg"></div>
+      <div class="row"><button id="nkRand" class="btn mid teal">🎲 כינוי אקראי</button><button id="nkSave" class="btn mid pink">שמירה</button></div>
+      <button id="nkLeave" class="btn mid gray hidden">יציאה מהטבלה</button>
+      <button id="nkBack" class="btn mid gray back">⬅ חזרה</button>
+    </div>
+  </section>
+  <!-- SURPRISE CODE -->
+  <section id="scrCode" class="screen panelscr">
+    <div class="panel">
+      <h2>🎟️ קוד הפתעה</h2>
+      <p class="sub">קיבלתם קוד מאפרתושקה במופע או ביום הולדת? הקלידו אותו כאן!</p>
+      <input id="codeIn" class="txt code" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" dir="ltr" placeholder="EF-XXXX-XXXX">
+      <div id="codeMsg" class="errmsg"></div>
+      <button id="codeGo" class="btn big pink">פתיחת ההפתעה ✨</button>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+  <!-- INSTALL HELP -->
+  <section id="scrInstall" class="screen panelscr">
+    <div class="panel">
+      <h2>📲 הוסיפו את אפרתושקה למסך הבית</h2>
+      <div id="instIOS" class="insteps"><p>1. לחצו על כפתור <b>השיתוף</b> <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 3v12M7 8l5-5 5 5" stroke="#2f7bff" stroke-width="2.2" fill="none"/><rect x="5" y="10" width="14" height="11" rx="2" stroke="#2f7bff" stroke-width="2.2" fill="none"/></svg> בתחתית ספארי</p><p>2. גללו ובחרו <b>„הוספה למסך הבית”</b></p><p>3. לחצו <b>„הוסף”</b> – וזהו! 🎉</p></div>
+      <div id="instOther" class="insteps hidden"><p>פתחו את תפריט הדפדפן (⋮) ובחרו <b>„הוספה למסך הבית”</b> או <b>„התקנת אפליקציה”</b>.</p></div>
+      <p class="ptext">אחרי ההתקנה המשחק עובד גם בלי אינטרנט.</p>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
     </div>
   </section>
 
@@ -351,7 +408,9 @@
 </div>
 <script src="js/data.js"></script>
 <script src="js/audio.js"></script>
+<script src="js/config.js"></script>
 <script src="js/v2.js"></script>
 <script src="js/main.js"></script>
+<script>if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
 </body>
 </html>

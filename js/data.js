@@ -43,39 +43,7 @@ const COLORS=[
  {id:'red',name:'אדום',hex:'#ff3b4e'},{id:'blue',name:'כחול',hex:'#2f7bff'},{id:'green',name:'ירוק',hex:'#2ecc55'},
  {id:'yellow',name:'צהוב',hex:'#ffd23f'},{id:'pink',name:'ורוד',hex:'#ff6fc8'},{id:'purple',name:'סגול',hex:'#9b59ff'}];
 const SHAPES=[{id:'circle',name:'עיגול'},{id:'square',name:'ריבוע'},{id:'triangle',name:'משולש'},{id:'heart',name:'לב'}];
-const ANIMALS=[{id:'dog',name:'כלב',e:'🐶'},{id:'cat',name:'חתול',e:'🐱'},{id:'lion',name:'אריה',e:'🦁'},{id:'elephant',name:'פיל',e:'🐘'},{id:'rabbit',name:'ארנב',e:'🐰'}];
-const CATS={fruit:['🍎','🍌','🍇','🍓','🍊','🍉'],animal:['🐶','🐱','🐰','🐻','🐸','🐵'],vehicle:['🚗','🚌','🚲','✈️','🚀','🚂'],sweet:['🍭','🍬','🧁','🍩','🍪','🎂'],flower:['🌸','🌻','🌷','🌼']};
 const NUMW=['','אחד','שניים','שלושה','ארבעה','חמישה'];
-const ORD=['ראשון','שני','שלישי','רביעי'];
-
-const RIDDLES=[
- ['יש לי ידיים אבל אני לא מוחא כפיים. מה אני?','שעון',['כפפה','רובוט']],
- ['יש לי שיניים אבל אני לא נושך. מה אני?','מסרק',['כריש','תנין']],
- ['אני מלא חורים ובכל זאת מחזיק מים. מה אני?','ספוג',['דלי','כוס']],
- ['יש לי קלידים אבל אני לא פותח דלתות. מה אני?','פסנתר',['מנעול','שוער']],
- ['ככל שאני מייבשת – אני נהיית רטובה יותר. מה אני?','מגבת',['שמש','רוח']],
- ['יש לי עין אחת אבל אני לא רואה. מה אני?','מחט',['פיראט','מצלמה']],
- ['אני נשבר ברגע שאומרים את שמי. מה אני?','שקט',['זכוכית','ביצה']],
- ['אני הולך איתך לכל מקום ונעלם בחושך. מה אני?','צל',['נעל','כובע']],
- ['יש לי צוואר אבל אין לי ראש. מה אני?','בקבוק',['ג׳ירפה','צעיף']],
- ['יש לי כובע ורגל אחת, ואני גדלה ביער. מה אני?','פטרייה',['ליצן','כיסא']],
- ['מתוקה, עם נרות, וחוגגים איתי ימי הולדת. מה אני?','עוגה',['עפיפון','עגבנייה']],
- ['מה ההפך של "גבוה"?','נמוך',['רחב','חזק']],
- ['מה ההפך של "שמח"?','עצוב',['כועס','עייף']],
- ['מה ההפך של "פתוח"?','סגור',['שבור','ריק']],
- ['מה ההפך של "מהר"?','לאט',['קרוב','שקט']],
- ['מה ההפך של "יום"?','לילה',['ערב','שמש']],
- ['איזו מילה מתחרזת עם "בלון"?','חלון',['כדור','שולחן']],
- ['איזו מילה מתחרזת עם "פרח"?','ירח',['עץ','שמש']],
- ['איזו מילה מתחרזת עם "כוכב"?','שוכב',['ענן','שמיים']],
- ['איזו מילה מתחרזת עם "דג"?','חג',['ים','סירה']],
- ['כמה אותיות יש במילה "מסיבה"?','5',['4','6']],
- ['כמה אותיות יש במילה "בלון"?','4',['3','5']],
- ['איזו מילה מתחילה באות ב׳?','בלון',['עוגה','כוכב']],
- ['איזו מילה מסתיימת באות ה׳?','מתנה',['כדור','שעון']],
- ['מי גר בכוורת?','דבורה',['נמלה','ציפור']],
- ['באיזה חודש יש הכי מעט ימים?','פברואר',['מאי','אוגוסט']],
-];
 
 /* each question: {prompt, voice, options:[3], correct, pre?} ; option kinds: balloon,shape,count,emoji,text */
 function threeWith(correct, pool, eq){
@@ -83,48 +51,34 @@ function threeWith(correct, pool, eq){
   const opts=shuffle([correct,...others]);
   return {options:opts, correct:opts.findIndex(x=>eq(x,correct))};
 }
-function numOpts(ans, spread){
-  const s=new Set([ans]);
-  let guard=0;
-  while(s.size<3 && guard++<50){const d=ri(1,spread)*(Math.random()<.5?-1:1); const v=ans+d; if(v>=0) s.add(v);}
-  while(s.size<3) s.add(ans+s.size+1);
-  const opts=shuffle([...s]).map(n=>({k:'text',t:String(n)}));
-  return {options:opts, correct:opts.findIndex(o=>o.t===String(ans))};
-}
-
+/* v3: light, glanceable gate questions. option kinds: balloon, shape, count, img, text, num */
+const ICONS={dog:'כלב',cat:'חתול',lion:'אריה',elephant:'פיל',rabbit:'ארנב',apple:'תפוח',banana:'בננה',strawberry:'תות',grapes:'ענבים',car:'מכונית',bus:'אוטובוס',plane:'מטוס',boat:'סירה'};
+const ICAT={animal:['dog','cat','lion','elephant','rabbit'],fruit:['apple','banana','strawberry','grapes'],vehicle:['car','bus','plane','boat']};
+function distinctNums(ans,lo,hi,spread){ const s=new Set([ans]); let g=0; while(s.size<3&&g++<80){ const v=ans+ri(1,spread)*(Math.random()<.5?-1:1); if(v>=lo&&v<=hi) s.add(v); } let k=1; while(s.size<3){ if(ans+k<=hi) s.add(ans+k); else s.add(Math.max(lo,ans-k)); k++; } return shuffle([...s]); }
+function numQ(prompt,ans,lo,hi,spread){ const ns=distinctNums(ans,lo,hi,spread); const opts=ns.map(n=>({k:'num',t:String(n)})); return {prompt,voice:null,options:opts,correct:ns.indexOf(ans),ltr:true}; }
 const Q={
  color(){const c=pick(COLORS); const r=threeWith(c,COLORS,(a,b)=>a.id===b.id);
    return {prompt:`איפה הבלון ה${c.name}?`,voice:'c_'+c.id,options:r.options.map(x=>({k:'balloon',color:x.hex})),correct:r.correct};},
- shape(){const s=pick(SHAPES); const r=threeWith(s,SHAPES,(a,b)=>a.id===b.id); const cols=shuffle(COLORS);
-   return {prompt:`איפה ה${s.name}?`,voice:'s_'+s.id,options:r.options.map((x,i)=>({k:'shape',shape:x.id,color:cols[i].hex})),correct:r.correct};},
- count(){const n=ri(1,5); const pool=[1,2,3,4,5]; const r=threeWith(n,pool,(a,b)=>a===b);
+ shape(){const s=pick(SHAPES); const r=threeWith(s,SHAPES,(a,b)=>a.id===b.id); const col=pick(COLORS).hex;
+   return {prompt:`איפה ה${s.name}?`,voice:'s_'+s.id,options:r.options.map(x=>({k:'shape',shape:x.id,color:col})),correct:r.correct};},
+ count(max){const pool=[1,2,3,4,5].slice(0,max||3); const n=pick(pool); const r=threeWith(n,pool.length>=3?pool:[1,2,3],(a,b)=>a===b);
    const col=pick(COLORS).hex;
    return {prompt:n===1?'איפה יש בלון אחד?':`איפה יש ${NUMW[n]} בלונים?`.replace('שניים','שני'),voice:'n_'+n,options:r.options.map(x=>({k:'count',n:x,color:col})),correct:r.correct};},
- animal(){const a=pick(ANIMALS); const r=threeWith(a,ANIMALS,(x,y)=>x.id===y.id);
-   return {prompt:`איפה ה${a.name}?`,voice:'a_'+a.id,options:r.options.map(x=>({k:'emoji',e:x.e})),correct:r.correct};},
- add(max){const a=ri(1,max-1), b=ri(1,max-a); const r=numOpts(a+b,3); return {prompt:`${a} + ${b} = ?`,voice:null,...r,ltr:true};},
- sub(max){const a=ri(3,max), b=ri(1,a-1); const r=numOpts(a-b,3); return {prompt:`${a} − ${b} = ?`,voice:null,...r,ltr:true};},
- odd(){const ks=shuffle(Object.keys(CATS)); const A=shuffle(CATS[ks[0]]).slice(0,2), B=pick(CATS[ks[1]]);
-   const opts=shuffle([...A.map(e=>({k:'emoji',e})),{k:'emoji',e:B}]);
-   return {prompt:'מה יוצא דופן?',voice:'q_odd',options:opts,correct:opts.findIndex(o=>o.e===B)};},
- pattern(hard){const set=shuffle(pick([CATS.fruit,CATS.sweet,CATS.animal,['🔴','🔵','🟡','🟢','🟣']])).slice(0,3);
-   const pats=hard?[[0,1,2],[0,0,1],[0,1,1],[0,1,2,1]]:[[0,1],[0,1],[0,0,1],[0,1,1]];
-   const p=pick(pats); const len=hard?7:5; const seq=[]; for(let i=0;i<len;i++) seq.push(set[p[i%p.length]]);
-   const ans=set[p[len%p.length]]; const opts=shuffle(set).map(e=>({k:'emoji',e}));
-   return {prompt:'מה בא אחר כך?',promptHtml:`<span class="emo" dir="rtl">${seq.join(' ')} ❓</span>`,voice:'q_pattern',options:opts,correct:opts.findIndex(o=>o.e===ans)};},
- mul(){const a=ri(2,10), b=ri(2,10); const r=numOpts(a*b,a>5?6:4); return {prompt:`${a} × ${b} = ?`,voice:null,...r,ltr:true};},
- div(){const b=ri(2,9), q=ri(2,10); const r=numOpts(q,3); return {prompt:`${b*q} ÷ ${b} = ?`,voice:null,...r,ltr:true};},
- three(){const a=ri(10,40), b=ri(5,30), c=ri(2,a+b-1); const r=numOpts(a+b-c,4); return {prompt:`${a} + ${b} − ${c} = ?`,voice:null,...r,ltr:true};},
- numseq(){const t=pick(['add','mul','sub']); let s,ans;
-   if(t==='add'){const st=ri(1,10),d=ri(2,9); s=[0,1,2,3].map(i=>st+i*d); ans=st+4*d;}
-   else if(t==='mul'){const st=ri(1,3),m=pick([2,3]); s=[0,1,2,3].map(i=>st*Math.pow(m,i)); ans=st*Math.pow(m,4);}
-   else {const d=ri(2,7),st=d*4+ri(5,30); s=[0,1,2,3].map(i=>st-i*d); ans=st-4*d;}
-   const r=numOpts(ans,Math.max(3,Math.round(ans*0.15))); return {prompt:'מה המספר הבא?',promptHtml:`<span dir="ltr">${s.join(', ')}, ?</span>`,voice:null,...r};},
- memory(){const set=shuffle(pick([CATS.fruit,CATS.animal,CATS.vehicle,CATS.sweet])).slice(0,4); const pos=ri(0,3);
-   const ans=set[pos]; const others=shuffle(set.filter(e=>e!==ans)).slice(0,2); const opts=shuffle([ans,...others]).map(e=>({k:'emoji',e}));
-   return {pre:{html:`זכרו את הסדר!<br><span class="emo" dir="rtl">${set.join(' ')}</span>`,secs:3.6},prompt:`מה היה ה${ORD[pos]} בתור?`,hint:'(סופרים מימין לשמאל)',voice:null,options:opts,correct:opts.findIndex(o=>o.e===ans)};},
- riddle(){const [q,a,d]=pick(RIDDLES); const opts=shuffle([a,...d]).map(t=>({k:'text',t}));
-   return {prompt:q,small:true,voice:null,options:opts,correct:opts.findIndex(o=>o.t===a)};},
+ animal(){const a=pick(ICAT.animal); const r=threeWith(a,ICAT.animal,(x,y)=>x===y);
+   return {prompt:`איפה ה${ICONS[a]}?`,voice:'a_'+a,options:r.options.map(x=>({k:'img',id:x})),correct:r.correct};},
+ add(max){const a=ri(1,max-1), b=ri(1,max-a); return Object.assign(numQ(`${a} + ${b}`,a+b,0,max,2),{eq:true});},
+ sub(max){const a=ri(3,max), b=ri(1,Math.min(5,a-1)); return Object.assign(numQ(`${a} − ${b}`,a-b,0,max,2),{eq:true});},
+ mul(){const a=ri(2,5), b=ri(2,5); return Object.assign(numQ(`${a} × ${b}`,a*b,1,30,3),{eq:true});},
+ bigger(max){ const ns=distinctNums(ri(3,max),1,max,Math.max(3,Math.round(max/3))); const big=Math.max(...ns); return {prompt:'איזה מספר הכי גדול?',voice:'q_big',options:ns.map(n=>({k:'num',t:String(n)})),correct:ns.indexOf(big)}; },
+ odd(){const ks=shuffle(Object.keys(ICAT)); const A=shuffle(ICAT[ks[0]]).slice(0,2), B=pick(ICAT[ks[1]]);
+   const opts=shuffle([...A,B]).map(id=>({k:'img',id}));
+   return {prompt:'מה יוצא דופן?',voice:'q_odd',options:opts,correct:opts.findIndex(o=>o.id===B)};},
+ pattern(){ // drawn shapes/colors pattern, AB or ABC
+   const useShape=Math.random()<.5; const cols=shuffle(COLORS).slice(0,3), shp=shuffle(SHAPES).slice(0,3);
+   const items=[0,1,2].map(i=>useShape?{k:'shape',shape:shp[i].id,color:cols[0].hex}:{k:'balloon',color:cols[i].hex});
+   const p=pick([[0,1],[0,1,2],[0,0,1]]); const seq=[]; for(let i=0;i<5;i++) seq.push(items[p[i%p.length]]);
+   const ans=p[5%p.length]; const order=shuffle([0,1,2]); const opts=order.map(i=>items[i]);
+   return {prompt:'מה בא אחר כך?',seq,voice:'q_pattern',options:opts,correct:order.indexOf(ans)};},
 };
 
 Object.keys(Q).forEach(k=>{ const f=Q[k]; Q[k]=(...a)=>Object.assign(f(...a),{cat:k}); });
@@ -132,16 +86,15 @@ Object.keys(Q).forEach(k=>{ const f=Q[k]; Q[k]=(...a)=>Object.assign(f(...a),{ca
 function ageGroup(age){return age<=5?0:age<=8?1:2;}
 function makeQuestion(age){
   const g=ageGroup(age);
-  if(g===0){ return (age<=3? pick([Q.color,Q.color,Q.shape,Q.animal]) : pick([Q.color,Q.shape,Q.count,Q.animal]))(); }
-  if(g===1){ const max=age<=6?10:20; return pick([()=>Q.add(max),()=>Q.add(max),()=>Q.sub(max),Q.odd,()=>Q.pattern(age>=8)])(); }
-  return pick([Q.mul,Q.div,Q.three,Q.numseq,Q.memory,Q.riddle,Q.riddle,()=>Q.pattern(true)])();
+  if(g===0){ return (age<=3? pick([Q.color,Q.color,Q.shape,Q.animal,Q.animal]) : age===4? pick([Q.color,Q.shape,Q.animal,()=>Q.count(3)]) : pick([Q.color,Q.shape,Q.animal,()=>Q.count(5)]))(); }
+  if(g===1){ return pick([()=>Q.add(age<=6?6:10),()=>Q.add(10),()=>Q.bigger(10),Q.odd,...(age>=8?[()=>Q.sub(10)]:[Q.odd])])(); }
+  return pick([()=>Q.add(20),Q.mul,Q.mul,()=>Q.bigger(50),Q.pattern,Q.pattern])();
 }
-
 const AGECFG=[
- {speed:10.5,levelSecs:55,gate:[15,20],gateLead:1.0,cols:1,obst:.45,approach:2.0},
- {speed:13,levelSecs:70,gate:[15,22],gateLead:.9,cols:2,obst:.75,approach:1.7},
- {speed:15,levelSecs:80,gate:[15,21],gateLead:.85,cols:3,obst:1,approach:1.45},
+ {speed:10.5,levelSecs:55,gate:[24,30],gateLead:1.0,cols:1,obst:.45,approach:2.0,gateSlow:.58},
+ {speed:13,levelSecs:70,gate:[26,32],gateLead:.9,cols:2,obst:.75,approach:1.7,gateSlow:.66},
+ {speed:15,levelSecs:80,gate:[24,30],gateLead:.85,cols:3,obst:1,approach:1.45,gateSlow:.74},
 ];
 
-return {WORLDS,OUTFITS,HAIRS,TRAILS,COLORS,SHAPES,makeQuestion,ageGroup,AGECFG,rnd,ri,pick,shuffle};
+return {WORLDS,OUTFITS,HAIRS,TRAILS,COLORS,SHAPES,ICONS,ICAT,makeQuestion,ageGroup,AGECFG,rnd,ri,pick,shuffle};
 })();

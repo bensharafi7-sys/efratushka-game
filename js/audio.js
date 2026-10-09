@@ -3,7 +3,7 @@
 window.EFA = (function(){
 const VOICES=['welcome','letsgo','champs','great','amazing','oops','almost','gate','combo','dance','thief','win','lose','level','record','magnet','fly','double','daily','outfit','mazal','bday',
  'c_red','c_blue','c_green','c_yellow','c_pink','c_purple','s_circle','s_square','s_triangle','s_heart','n_1','n_2','n_3','n_4','n_5','a_dog','a_cat','a_lion','a_elephant','a_rabbit','q_odd','q_pattern'];
-const V2=["m_done", "journey", "egg_found", "hatch", "p_unicorn", "p_kitten", "p_dragon", "p_panda", "p_puppy", "p_bunny", "pet_love", "pet_level", "city_color", "city_done", "vehicle", "saved", "gold", "upgrade", "wheel", "lucky", "gift", "sticker", "shiny", "album", "h_purim", "h_hanukkah", "h_independence", "h_roshhashana", "h_sukkot", "challenge", "ch_win", "ch_lose", "teach", "yourturn", "teach_ok", "rest", "buddy", "photo", "together"];
+const V2=["m_done", "journey", "egg_found", "hatch", "p_unicorn", "p_kitten", "p_dragon", "p_panda", "p_puppy", "p_bunny", "pet_love", "pet_level", "city_color", "city_done", "vehicle", "saved", "gold", "upgrade", "wheel", "lucky", "gift", "sticker", "shiny", "album", "h_purim", "h_hanukkah", "h_independence", "h_roshhashana", "h_sukkot", "challenge", "ch_win", "ch_lose", "teach", "yourturn", "teach_ok", "rest", "buddy", "photo", "together","enc1","enc2","enc3","enc4","enc5","enc6","enc7","oops2","oops3","hi_wave","hi_five","hi_five_ok","clap","clap_ok","kiss","thumbs","name_call","pet_hop","pet_cute","pet_scared","pet_go","idle1","idle2","idle3","joke1","joke2","code_ok","code_bad","champs_week","lb_you","install","q_big","welcome2","gate_soon"];
 const SFX=['jump','coin','correct','wrong','powerup','confetti','bump'];
 const MUSIC=['theme','candy','sky','disco','chip'];
 const ROT=['candy','sky','disco','chip'];
@@ -60,8 +60,11 @@ function playBuf(k,bus,vol,rate){
 function sfx(n,vol,rate){ return playBuf('s_'+n,sfxBus,vol,rate); }
 let v2loading=null;
 function loadV2(){ if(v2loading) return v2loading; v2loading=(async()=>{ for(const v of V2){ const k='v_'+v; if(raw[k]||buf[k]) continue; try{ raw[k]=await fetchBin('assets/audio/voice/'+v+'.mp3'); if(ctx) await decodeOne(k); }catch(e){} } })(); return v2loading; }
+const VARS={great:['great','enc1','enc2','enc4','enc7'],amazing:['amazing','enc3','enc5','enc4'],champs:['champs','enc6','enc3','enc5'],oops:['oops','oops2','oops3'],almost:['almost','oops2','oops3'],gate:['gate','gate_soon']};
+const lastVar={};
+function variant(n){ const l=VARS[n]; if(!l) return n; let c, g=0; do{ c=l[Math.floor(Math.random()*l.length)]; }while(c===lastVar[n]&&g++<8); lastVar[n]=c; return c; }
 function voice(n,opts){
-  opts=opts||{};
+  opts=opts||{}; if(!opts._lazy&&!opts.exact) n=variant(n);
   if(!ctx) return 0;
   const k='v_'+n;
   if(!buf[k]&&V2.includes(n)&&!opts._lazy){ const t0=performance.now(); (raw[k]?Promise.resolve():fetchBin('assets/audio/voice/'+n+'.mp3').then(b=>{ if(!buf[k]) raw[k]=b; })).then(()=>decodeOne(k)).then(()=>{ if(buf[k]&&performance.now()-t0<2500) voice(n,Object.assign({},opts,{_lazy:true})); }).catch(()=>{}); return 0; }
@@ -112,5 +115,5 @@ function resume(){ if(ctx&&ctx.state==='suspended') ctx.resume(); if(cur){ const
 let rate=1;
 function setRate(r){ rate=r; if(cur){ try{ cur.playbackRate=r; }catch(e){} } }
 function voiceBusy(){ return ctx? ctx.currentTime<voiceEnd : false; }
-return {VOICES,V2,loadV2,setRate,SFX,preload,makeEls,unlock,sfx,voice,menuMusic,gameMusic,stopMusic,tick,prepBattle,startBattle,battleTime,stopBattle,setMuted,suspend,resume,voiceBusy,decodeOne,get ctx(){return ctx;}};
+return {VARS,VOICES,V2,loadV2,setRate,SFX,preload,makeEls,unlock,sfx,voice,menuMusic,gameMusic,stopMusic,tick,prepBattle,startBattle,battleTime,stopBattle,setMuted,suspend,resume,voiceBusy,decodeOne,get ctx(){return ctx;}};
 })();
