@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ff5fb4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="אפרתושקה: מסיבת הקסם – משחק ריצה, חידות וריקודים לילדים">
+<meta property="og:type" content="website">
+<meta property="og:title" content="אפרתושקה: מסיבת הקסם 🎉">
+<meta property="og:description" content="משחק ריצה, חידות וקרב ריקודים לילדים – עזרו לאפרתושקה להחזיר את המסיבה מגנב הצבעים!">
+<meta property="og:image" content="https://bensharafi7-sys.github.io/efratushka-game/assets/img/og.jpg">
+<meta property="og:url" content="https://bensharafi7-sys.github.io/efratushka-game/">
+<meta name="twitter:card" content="summary_large_image">
+<title>אפרתושקה: מסיבת הקסם</title>
+<link rel="icon" href="assets/img/icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game" aria-label="מסך המשחק"></canvas>
+
+  <!-- LOADING -->
+  <section id="scrLoading" class="screen show">
+    <div class="logo"><span class="l1">אפרתושקה</span><span class="l2">מסיבת הקסם ✨</span></div>
+    <div class="loadwrap"><div class="bar"><i id="loadBar"></i></div><div id="loadTxt">טוענים את המסיבה…</div></div>
+    <div id="bdayInvite" class="invite hidden"></div>
+    <button id="btnStart" class="btn big pink hidden">יאללה מתחילים! 🎉</button>
+  </section>
+
+  <!-- MENU -->
+  <section id="scrMenu" class="screen">
+    <div class="topbar">
+      <div class="pill" id="menuStars">⭐ 0</div>
+      <div class="pill" id="menuStreak" title="רצף ימים">🔥 0</div>
+      <button class="iconbtn" id="btnSound" aria-label="צליל">🔊</button>
+    </div>
+    <div class="logo small"><span class="l1">אפרתושקה</span><span class="l2">מסיבת הקסם ✨</span></div>
+    <div id="bdayChip" class="bdaychip hidden"></div>
+    <div class="menuBottom">
+      <div class="agebox">
+        <div class="agetitle">בן/בת כמה השחקן?</div>
+        <div class="ages" id="ages"></div>
+      </div>
+      <button id="btnPlay" class="btn big pink">▶ שחקו!</button>
+      <div class="row">
+        <button id="btnBday" class="btn mid purple">🎂 יום הולדת</button>
+        <button id="btnWardrobe" class="btn mid teal">👗 ארון בגדים</button>
+      </div>
+      <div class="levelInfo" id="levelInfo"></div>
+    </div>
+  </section>
+
+  <!-- BIRTHDAY SETUP -->
+  <section id="scrBday" class="screen panelscr">
+    <div class="panel">
+      <h2>🎂 מצב יום הולדת</h2>
+      <p class="sub">כתבו את שם החוגג/ת – השם יופיע על הבלונים, השלט והעוגה!</p>
+      <label class="lbl" for="bdName">שם הילד/ה</label>
+      <input id="bdName" maxlength="16" autocomplete="off" placeholder="למשל: נועה">
+      <label class="lbl">גיל (לא חובה)</label>
+      <div class="ages" id="bdAges"></div>
+      <div id="bdLinkBox" class="linkbox hidden">
+        <div class="lbl">קישור אישי למסיבה:</div>
+        <div id="bdLink" class="link" dir="ltr"></div>
+        <div class="row">
+          <button id="bdCopy" class="btn mid teal">📋 העתקה</button>
+          <button id="bdWa" class="btn mid green">💬 וואטסאפ</button>
+        </div>
+      </div>
+      <button id="bdGo" class="btn big pink">🎉 התחילו את המסיבה</button>
+      <div class="row">
+        <button id="bdMake" class="btn mid purple">🔗 צרו קישור</button>
+        <button id="bdOff" class="btn mid gray">ביטול מצב יום הולדת</button>
+      </div>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- WARDROBE -->
+  <section id="scrWardrobe" class="screen panelscr">
+    <div class="panel wide">
+      <h2>👗 ארון הבגדים</h2>
+      <div class="wstars" id="wStars">⭐ 0</div>
+      <div class="wprev"><canvas id="wCanvas" width="300" height="420"></canvas></div>
+      <div class="tabs">
+        <button class="tab on" data-tab="outfit">בגדים</button>
+        <button class="tab" data-tab="hair">שיער</button>
+        <button class="tab" data-tab="trail">שובל קסם</button>
+      </div>
+      <div class="items" id="wItems"></div>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="hudtop">
+      <button class="iconbtn" id="btnPause" aria-label="הפסקה">⏸</button>
+      <div class="pill" id="hudStars">⭐ 0</div>
+      <div class="pill combo hidden" id="hudCombo">קומבו ×2</div>
+      <div class="pill pw hidden" id="hudPower"></div>
+    </div>
+    <div class="prog"><div class="track"><i id="progFill"></i><b id="progThief">🦝</b><b id="progGirl">👧</b></div></div>
+    <div id="bdayTag" class="bdaytag hidden"></div>
+  </div>
+
+  <!-- QUIZ BANNER -->
+  <div id="quiz" class="quiz hidden"><div class="qtitle">✨ שער הקסם ✨</div><div class="qtext" id="qText"></div><div class="qhint" id="qHint">רוצו לשער הנכון!</div></div>
+
+  <!-- BATTLE HUD -->
+  <div id="bHud" class="hidden">
+    <div class="meter"><span>אפרתושקה</span><div class="mbar"><i id="mFill"></i></div><span>הגנב</span></div>
+    <div id="bTitle" class="btitle"></div>
+  </div>
+
+  <!-- RESULT -->
+  <section id="scrResult" class="screen bottomscr">
+    <div class="panel">
+      <h2 id="rTitle">השלב הושלם! 🎉</h2>
+      <div class="rstats" id="rStats"></div>
+      <button id="rNext" class="btn big pink">לשלב הבא ▶</button>
+      <div class="row">
+        <button id="rShare" class="btn mid green">📣 שתפו תוצאה</button>
+        <button id="rMenu" class="btn mid gray">🏠 תפריט</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BIRTHDAY FINALE -->
+  <section id="scrFinale" class="screen finalescr">
+    <div class="fbanner"><div class="f1">יום הולדת שמח</div><div class="f2" id="fName"></div><div class="f3" id="fAge"></div></div>
+    <div class="panel fpanel">
+      <div class="rstats" id="fStats"></div>
+      <button id="fWa" class="btn big green">💬 שלחו ברכה בוואטסאפ</button>
+      <div class="row">
+        <button id="fNext" class="btn mid pink">▶ ממשיכים לשחק</button>
+        <button id="fMenu" class="btn mid gray">🏠 תפריט</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAUSE -->
+  <section id="scrPause" class="screen panelscr">
+    <div class="panel">
+      <h2>⏸ הפסקה</h2>
+      <button id="pResume" class="btn big pink">▶ ממשיכים</button>
+      <button id="pSound" class="btn mid teal">🔊 צליל: פועל</button>
+      <button id="pMenu" class="btn mid gray">🏠 לתפריט</button>
+    </div>
+  </section>
+
+  <!-- DAILY -->
+  <section id="scrDaily" class="screen panelscr">
+    <div class="panel">
+      <div class="gift">🎁</div>
+      <h2>הפתעה יומית!</h2>
+      <p class="sub" id="dTxt"></p>
+      <div class="dstreak" id="dStreak"></div>
+      <button id="dTake" class="btn big pink">אספו את המתנה ⭐</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+  <div id="rotate" class="rotate">סובבו את הטלפון לאורך 📱</div>
+</div>
+<script src="js/data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

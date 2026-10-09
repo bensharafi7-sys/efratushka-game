@@ -1,0 +1,44 @@
+{
+ "run": {
+  "fw": 204,
+  "fh": 440,
+  "n": 16,
+  "cols": 16,
+  "file": "assets/sprites/run.webp"
+ },
+ "duck": {
+  "fw": 244,
+  "fh": 360,
+  "n": 13,
+  "cols": 13,
+  "file": "assets/sprites/duck.webp"
+ },
+ "jump": {
+  "fw": 196,
+  "fh": 340,
+  "n": 24,
+  "cols": 20,
+  "file": "assets/sprites/jump.webp"
+ },
+ "celebrate": {
+  "fw": 198,
+  "fh": 340,
+  "n": 60,
+  "cols": 20,
+  "file": "assets/sprites/celebrate.webp"
+ },
+ "oops": {
+  "fw": 228,
+  "fh": 340,
+  "n": 50,
+  "cols": 17,
+  "file": "assets/sprites/oops.webp"
+ },
+ "dance": {
+  "fw": 186,
+  "fh": 340,
+  "n": 60,
+  "cols": 22,
+  "file": "assets/sprites/dance.webp"
+ }
+}
