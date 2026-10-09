@@ -13,13 +13,6 @@
   "cols": 13,
   "file": "assets/sprites/duck.webp"
  },
- "jump": {
-  "fw": 196,
-  "fh": 340,
-  "n": 24,
-  "cols": 20,
-  "file": "assets/sprites/jump.webp"
- },
  "celebrate": {
   "fw": 198,
   "fh": 340,
@@ -40,5 +33,12 @@
   "n": 60,
   "cols": 22,
   "file": "assets/sprites/dance.webp"
+ },
+ "jumpb": {
+  "fw": 168,
+  "fh": 340,
+  "n": 16,
+  "cols": 16,
+  "file": "assets/sprites/jumpb.webp"
  }
 }

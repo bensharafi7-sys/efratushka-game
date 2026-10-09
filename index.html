@@ -32,23 +32,35 @@
   <!-- MENU -->
   <section id="scrMenu" class="screen">
     <div class="topbar">
+      <button class="avatar" id="btnProfile" aria-label="פרופיל"><span id="avImg">★</span><b id="avName">הפרופיל שלי</b></button>
       <div class="pill" id="menuStars">⭐ 0</div>
       <div class="pill" id="menuStreak" title="רצף ימים">🔥 0</div>
       <button class="iconbtn" id="btnSound" aria-label="צליל">🔊</button>
     </div>
     <div class="logo small"><span class="l1">אפרתושקה</span><span class="l2">מסיבת הקסם ✨</span></div>
     <div id="bdayChip" class="bdaychip hidden"></div>
+    <div id="chalBanner" class="chal hidden"></div>
+    <div id="holiBanner" class="holi hidden"></div>
     <div class="menuBottom">
+      <div class="tiles">
+        <button class="tile" id="tMissions"><img src="assets/v2/wd_starlamp.webp" alt=""><span>משימות</span><i class="dot hidden"></i></button>
+        <button class="tile" id="tJourney"><img src="assets/v2/wd_rocket.webp" alt=""><span>מסע הכוכבים</span><i class="dot hidden"></i></button>
+        <button class="tile" id="tPets"><img src="assets/v2/pet_unicorn.webp" alt=""><span>חברי קסם</span><i class="dot hidden"></i></button>
+        <button class="tile" id="tCity"><img src="assets/v2/dec_castle.webp" alt=""><span>עיר המסיבה</span><i class="dot hidden"></i></button>
+        <button class="tile" id="tWheel"><b class="wheelic"></b><span>גלגל המזל</span><i class="dot hidden"></i></button>
+        <button class="tile" id="tShop"><img src="assets/v2/veh_cloud.webp" alt=""><span>חנות קסם</span></button>
+        <button class="tile" id="tAlbum"><img src="assets/v2/dec_balloon.webp" alt=""><span>אלבום</span></button>
+        <button class="tile" id="btnWardrobe"><img src="assets/img/front.webp" alt="" class="ef"><span>ארון בגדים</span></button>
+        <button class="tile" id="tDance"><img src="assets/v2/dec_dj.webp" alt=""><span>שיעור ריקוד</span></button>
+        <button class="tile" id="btnBday"><img src="assets/v2/dec_cake.webp" alt=""><span>יום הולדת</span></button>
+      </div>
       <div class="agebox">
         <div class="agetitle">בן/בת כמה השחקן?</div>
         <div class="ages" id="ages"></div>
       </div>
+      <div class="worlds" id="worldPick"></div>
       <button id="btnPlay" class="btn big pink">▶ שחקו!</button>
-      <div class="row">
-        <button id="btnBday" class="btn mid purple">🎂 יום הולדת</button>
-        <button id="btnWardrobe" class="btn mid teal">👗 ארון בגדים</button>
-      </div>
-      <div class="levelInfo" id="levelInfo"></div>
+      <div class="levelInfo"><span id="levelInfo"></span> <button id="btnParents" class="linkbtn">👪 אזור הורים</button></div>
     </div>
   </section>
 
@@ -61,6 +73,8 @@
       <input id="bdName" maxlength="16" autocomplete="off" placeholder="למשל: נועה">
       <label class="lbl">גיל (לא חובה)</label>
       <div class="ages" id="bdAges"></div>
+      <button id="bdPhoto" class="btn mid teal photobtn">📷 הוסיפו תמונה של החוגג/ת (לא חובה)</button>
+      <p class="privacy">🔒 התמונה נשארת רק במכשיר שלכם – לא נשלחת ולא נכנסת לקישור</p>
       <div id="bdLinkBox" class="linkbox hidden">
         <div class="lbl">קישור אישי למסיבה:</div>
         <div id="bdLink" class="link" dir="ltr"></div>
@@ -101,7 +115,9 @@
       <div class="pill" id="hudStars">⭐ 0</div>
       <div class="pill combo hidden" id="hudCombo">קומבו ×2</div>
       <div class="pill pw hidden" id="hudPower"></div>
+      <div class="goldbar" id="goldBar" title="קדחת זהב"><i id="goldFill"></i></div>
     </div>
+    <button id="btnRide" class="ridebtn hidden" aria-label="רכב קסם"><img id="rideImg" alt=""><span>×2 הקשה</span></button>
     <div class="prog"><div class="track"><i id="progFill"></i><b id="progThief">🦝</b><b id="progGirl">👧</b></div></div>
     <div id="bdayTag" class="bdaytag hidden"></div>
   </div>
@@ -120,9 +136,16 @@
     <div class="panel">
       <h2 id="rTitle">השלב הושלם! 🎉</h2>
       <div class="rstats" id="rStats"></div>
+      <div id="rChal" class="rchal hidden"></div>
+      <div id="rGains" class="rgains"></div>
+      <button id="rLesson" class="btn mid purple hidden">💃 שיעור ריקוד חדש!</button>
       <button id="rNext" class="btn big pink">לשלב הבא ▶</button>
       <div class="row">
-        <button id="rShare" class="btn mid green">📣 שתפו תוצאה</button>
+        <button id="rChallenge" class="btn mid purple">⚔ תנצחו אותי!</button>
+        <button id="rCard" class="btn mid teal">📸 כרטיס</button>
+      </div>
+      <div class="row">
+        <button id="rShare" class="btn mid green">📣 שתפו</button>
         <button id="rMenu" class="btn mid gray">🏠 תפריט</button>
       </div>
     </div>
@@ -134,6 +157,7 @@
     <div class="panel fpanel">
       <div class="rstats" id="fStats"></div>
       <button id="fWa" class="btn big green">💬 שלחו ברכה בוואטסאפ</button>
+      <button id="fCard" class="btn mid teal">📸 כרטיס ברכה</button>
       <div class="row">
         <button id="fNext" class="btn mid pink">▶ ממשיכים לשחק</button>
         <button id="fMenu" class="btn mid gray">🏠 תפריט</button>
@@ -162,11 +186,172 @@
     </div>
   </section>
 
+  <!-- QUEST: missions + journey -->
+  <section id="scrQuest" class="screen panelscr">
+    <div class="panel wide">
+      <div class="tabs"><button class="tab qtab on" data-q="m">משימות היום</button><button class="tab qtab" data-q="j">מסע הכוכבים</button></div>
+      <div id="qMissions" class="mlist"></div>
+      <div id="qJourney" class="hidden">
+        <div class="jhead"><b id="jTier"></b><div class="mbar2"><i id="jFill"></i></div><small id="jReset"></small></div>
+        <div id="jList" class="jlist"></div>
+      </div>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- PETS -->
+  <section id="scrPets" class="screen panelscr">
+    <div class="panel wide">
+      <h2>חברי הקסם <small class="pst" id="pStars">⭐ 0</small></h2>
+      <div id="petStage" class="petstage"><img id="petBig" alt="" class="hidden"><p id="petEmpty" class="sub">עוד אין חברים – בקעו ביצה כדי לפגוש חבר קסם!</p></div>
+      <div id="petInfo" class="petinfo"></div>
+      <div class="row" id="petRow"><button id="petFeed" class="btn mid green">🍓 האכלה · 20⭐</button><button id="petSel" class="btn mid purple">🏃 שיצטרף לריצה</button></div>
+      <div class="lbl">החברים שלי</div><div id="petList" class="petlist"></div>
+      <div class="lbl">ביצים בדגירה</div><div id="eggList" class="egglist"></div>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- CITY -->
+  <section id="scrCity" class="screen citysc">
+    <div class="citytop"><button class="iconbtn" data-back aria-label="חזרה">⬅</button><div class="pill" id="cityTitle"></div><div class="pill" id="cityStars">⭐ 0</div></div>
+    <div class="citybot"><button id="cityNext" class="iconbtn" aria-label="הבא">▶</button><div id="cityInfo" class="cityinfo"></div><button id="cityPrev" class="iconbtn" aria-label="הקודם">◀</button></div>
+  </section>
+
+  <!-- SHOP -->
+  <section id="scrShop" class="screen panelscr">
+    <div class="panel wide">
+      <h2>חנות הקסם <small class="pst" id="sStars">⭐ 0</small></h2>
+      <p class="sub">קונים רק בכוכבים שאוספים במשחק ⭐</p>
+      <div class="tabs"><button class="tab stab on" data-s="upg">שדרוגים</button><button class="tab stab" data-s="veh">רכבי קסם</button></div>
+      <div id="shopList" class="slist"></div>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- ALBUM -->
+  <section id="scrAlbum" class="screen panelscr">
+    <div class="panel wide">
+      <h2>אלבום המדבקות</h2>
+      <div id="albTabs" class="atabs"></div>
+      <div id="albGrid" class="agrid"></div>
+      <p id="albInfo" class="sub"></p>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- WHEEL -->
+  <section id="scrWheel" class="screen panelscr">
+    <div class="panel">
+      <h2>גלגל המזל</h2>
+      <canvas id="wheelCv" width="320" height="320" class="wheelcv"></canvas>
+      <button id="wheelSpin" class="btn big pink">🎡 סובבו!</button>
+      <p id="wheelInfo" class="sub"></p>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="scrProfile" class="screen panelscr">
+    <div class="panel">
+      <h2>הפרופיל שלי</h2>
+      <label class="lbl" for="pfName">שם</label>
+      <input id="pfName" class="txt" maxlength="16" autocomplete="off" placeholder="השם שלכם">
+      <canvas id="pfCrop" width="280" height="280" class="crop"></canvas>
+      <input type="range" id="pfZoom" class="zoom hidden" min="1" max="4" step="0.01" value="1" aria-label="זום">
+      <div class="row">
+        <label class="btn mid teal filebtn">📷 צלמו<input type="file" id="pfCam" accept="image/*" capture="user"></label>
+        <label class="btn mid purple filebtn">🖼 מהגלריה<input type="file" id="pfGal" accept="image/*"></label>
+      </div>
+      <p class="privacy">🔒 התמונה נשארת רק במכשיר שלכם</p>
+      <label class="chk"><input type="checkbox" id="pfBuddy" checked> החבר/ה שלי רץ/ה לצד אפרתושקה</label>
+      <button id="pfSave" class="btn big pink">שמירה ✔</button>
+      <div class="row"><button id="pfDel" class="btn mid gray">🗑 מחיקת התמונה</button><button id="pfBack" class="btn mid gray">⬅ חזרה</button></div>
+    </div>
+  </section>
+
+  <!-- PARENT GATE -->
+  <section id="scrPGate" class="screen panelscr">
+    <div class="panel">
+      <h2>👪 רק להורים</h2>
+      <p class="sub">כדי להיכנס, פתרו את התרגיל:</p>
+      <div id="pgQ" class="pgq" dir="ltr"></div>
+      <input id="pgIn" class="txt" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" dir="ltr">
+      <button id="pgOk" class="btn big purple">כניסה</button>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- PARENTS -->
+  <section id="scrParents" class="screen panelscr">
+    <div class="panel wide">
+      <h2>👪 אזור הורים</h2>
+      <div class="lbl">זמן משחק יומי</div>
+      <div id="parLimit" class="chips"></div>
+      <div id="parUsed" class="sub"></div>
+      <button id="parMore" class="btn mid teal">+15 דקות להיום</button>
+      <div class="lbl">התקדמות ולמידה</div>
+      <div id="parStats" class="pstats"></div>
+      <div class="lbl">עולמות חג</div>
+      <select id="parHoli" class="sel">
+        <option value="auto">אוטומטי לפי הלוח העברי</option><option value="none">כבוי</option>
+        <option value="purim">פורים (בדיקה)</option><option value="hanukkah">חנוכה (בדיקה)</option><option value="independence">יום העצמאות (בדיקה)</option><option value="roshhashana">ראש השנה (בדיקה)</option><option value="sukkot">סוכות (בדיקה)</option>
+      </select>
+      <div class="lbl">פרטיות</div>
+      <p class="ptext">אין במשחק פרסומות, קניות בכסף אמיתי או מעקב. כל ההתקדמות והתמונה נשמרות רק בדפדפן במכשיר הזה. קישורי שיתוף כוללים רק שם וגיל/ניקוד – אף פעם לא תמונה.</p>
+      <div class="row"><button id="parDelPhoto" class="btn mid gray">🗑 מחיקת התמונה</button><button id="parReset" class="btn mid gray">איפוס התקדמות</button></div>
+      <button class="btn mid gray back" data-back>⬅ חזרה למשחק</button>
+    </div>
+  </section>
+
+  <!-- REST -->
+  <section id="scrRest" class="screen panelscr">
+    <div class="panel">
+      <img id="restImg" class="restimg" alt="">
+      <h2>זמן לנוח 🌙</h2>
+      <p class="sub">עשינו המון כיף היום! נתראה מחר עם עוד הפתעות.</p>
+      <button id="restParents" class="btn mid gray">👪 הורים: עוד זמן</button>
+    </div>
+  </section>
+
+  <!-- DANCE LESSON -->
+  <section id="scrLesson" class="screen lessonsc">
+    <div class="lstop"><button id="lsQuit" class="iconbtn" aria-label="יציאה">✖</button><div><div id="lsTitle" class="lstitle"></div><div id="lsInfo" class="lsinfo"></div></div></div>
+    <div id="lsDone" class="panel lsdone hidden"><h2>💃 כל הכבוד!</h2><p id="lsDoneTxt" class="sub"></p><button id="lsBack" class="btn big pink">🏠 לתפריט</button></div>
+    <div id="lsMoves" class="lsmoves"></div>
+  </section>
+
+  <!-- SHARE CARD -->
+  <section id="scrCard" class="screen panelscr">
+    <div class="panel">
+      <h2>📸 כרטיס שיתוף</h2>
+      <canvas id="cardCv" width="1080" height="1350" class="cardcv"></canvas>
+      <label class="chk hidden" id="cardPhotoRow"><input type="checkbox" id="cardPhoto"> להוסיף את התמונה שלי לכרטיס</label>
+      <p class="privacy">הכרטיס נוצר במכשיר ונשלח רק אם תלחצו "שיתוף"</p>
+      <div class="row"><button id="cardShare" class="btn mid green">📤 שיתוף</button><button id="cardSave" class="btn mid teal">⬇ הורדה</button></div>
+      <button id="cardBack" class="btn mid gray back">⬅ חזרה</button>
+    </div>
+  </section>
+
+  <!-- REWARD REVEAL -->
+  <div id="reveal" class="reveal hidden">
+    <div class="rvrays"></div>
+    <div class="rvbox">
+      <canvas id="rvCanvas" width="300" height="300" class="hidden"></canvas>
+      <img id="rvImg" alt="">
+      <div id="rvSw" class="rvsw hidden"></div>
+      <div id="rvTitle" class="rvtitle"></div>
+      <div id="rvSub" class="rvsub"></div>
+      <button id="rvOk" class="btn big pink">יש! ✔</button>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
   <div id="rotate" class="rotate">סובבו את הטלפון לאורך 📱</div>
 </div>
 <script src="js/data.js"></script>
 <script src="js/audio.js"></script>
+<script src="js/v2.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

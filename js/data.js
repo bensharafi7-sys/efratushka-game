@@ -127,6 +127,8 @@ const Q={
    return {prompt:q,small:true,voice:null,options:opts,correct:opts.findIndex(o=>o.t===a)};},
 };
 
+Object.keys(Q).forEach(k=>{ const f=Q[k]; Q[k]=(...a)=>Object.assign(f(...a),{cat:k}); });
+
 function ageGroup(age){return age<=5?0:age<=8?1:2;}
 function makeQuestion(age){
   const g=ageGroup(age);

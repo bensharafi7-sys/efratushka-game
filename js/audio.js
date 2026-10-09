@@ -3,6 +3,7 @@
 window.EFA = (function(){
 const VOICES=['welcome','letsgo','champs','great','amazing','oops','almost','gate','combo','dance','thief','win','lose','level','record','magnet','fly','double','daily','outfit','mazal','bday',
  'c_red','c_blue','c_green','c_yellow','c_pink','c_purple','s_circle','s_square','s_triangle','s_heart','n_1','n_2','n_3','n_4','n_5','a_dog','a_cat','a_lion','a_elephant','a_rabbit','q_odd','q_pattern'];
+const V2=["m_done", "journey", "egg_found", "hatch", "p_unicorn", "p_kitten", "p_dragon", "p_panda", "p_puppy", "p_bunny", "pet_love", "pet_level", "city_color", "city_done", "vehicle", "saved", "gold", "upgrade", "wheel", "lucky", "gift", "sticker", "shiny", "album", "h_purim", "h_hanukkah", "h_independence", "h_roshhashana", "h_sukkot", "challenge", "ch_win", "ch_lose", "teach", "yourturn", "teach_ok", "rest", "buddy", "photo", "together"];
 const SFX=['jump','coin','correct','wrong','powerup','confetti','bump'];
 const MUSIC=['theme','candy','sky','disco','chip'];
 const ROT=['candy','sky','disco','chip'];
@@ -57,9 +58,13 @@ function playBuf(k,bus,vol,rate){
   const g=ctx.createGain(); g.gain.value=vol==null?1:vol; s.connect(g); g.connect(bus); s.start(); return s;
 }
 function sfx(n,vol,rate){ return playBuf('s_'+n,sfxBus,vol,rate); }
+let v2loading=null;
+function loadV2(){ if(v2loading) return v2loading; v2loading=(async()=>{ for(const v of V2){ const k='v_'+v; if(raw[k]||buf[k]) continue; try{ raw[k]=await fetchBin('assets/audio/voice/'+v+'.mp3'); if(ctx) await decodeOne(k); }catch(e){} } })(); return v2loading; }
 function voice(n,opts){
   opts=opts||{};
   if(!ctx) return 0;
+  const k='v_'+n;
+  if(!buf[k]&&V2.includes(n)&&!opts._lazy){ const t0=performance.now(); (raw[k]?Promise.resolve():fetchBin('assets/audio/voice/'+n+'.mp3').then(b=>{ if(!buf[k]) raw[k]=b; })).then(()=>decodeOne(k)).then(()=>{ if(buf[k]&&performance.now()-t0<2500) voice(n,Object.assign({},opts,{_lazy:true})); }).catch(()=>{}); return 0; }
   if(curVoice && !opts.overlap){ try{curVoice.stop();}catch(e){} curVoice=null; }
   const s=playBuf('v_'+n,voiceBus,1);
   if(!s) return 0;
@@ -76,7 +81,7 @@ function setGain(m,v,time){
 function startTrack(m,fadeIn){
   const a=els[m]; if(!a) return;
   if(cur&&cur!==a){ stopTrack(curName,1.2); }
-  cur=a; curName=m; a.currentTime=0; setGain(m,0,.01); setGain(m,1,fadeIn||1.0);
+  cur=a; curName=m; a.currentTime=0; try{ a.playbackRate=rate; }catch(e){} setGain(m,0,.01); setGain(m,1,fadeIn||1.0);
   const p=a.play(); if(p&&p.catch) p.catch(()=>{});
 }
 function stopTrack(m,t){
@@ -104,6 +109,8 @@ function stopBattle(){ if(battleSrc){ const {s,g}=battleSrc; const t=ctx.current
 function setMuted(m){ muted=m; if(master&&ctx) master.gain.setTargetAtTime(m?0:1,ctx.currentTime,.05); if(!ctx) MUSIC.forEach(k=>els[k].muted=m); }
 function suspend(){ if(ctx&&ctx.state==='running') ctx.suspend(); if(cur) cur.pause(); }
 function resume(){ if(ctx&&ctx.state==='suspended') ctx.resume(); if(cur){ const p=cur.play(); if(p&&p.catch) p.catch(()=>{});} }
+let rate=1;
+function setRate(r){ rate=r; if(cur){ try{ cur.playbackRate=r; }catch(e){} } }
 function voiceBusy(){ return ctx? ctx.currentTime<voiceEnd : false; }
-return {VOICES,SFX,preload,makeEls,unlock,sfx,voice,menuMusic,gameMusic,stopMusic,tick,prepBattle,startBattle,battleTime,stopBattle,setMuted,suspend,resume,voiceBusy,decodeOne,get ctx(){return ctx;}};
+return {VOICES,V2,loadV2,setRate,SFX,preload,makeEls,unlock,sfx,voice,menuMusic,gameMusic,stopMusic,tick,prepBattle,startBattle,battleTime,stopBattle,setMuted,suspend,resume,voiceBusy,decodeOne,get ctx(){return ctx;}};
 })();
