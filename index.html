@@ -14,9 +14,10 @@
 <meta property="og:url" content="https://bensharafi7-sys.github.io/efratushka-game/">
 <meta name="twitter:card" content="summary_large_image">
 <title>אפרתושקה: מסיבת הקסם</title>
-<link rel="icon" href="assets/img/icon.png">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/img/ef-favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/img/ef-icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="assets/img/icon-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/img/ef-apple-180.png">
 <meta name="apple-mobile-web-app-title" content="אפרתושקה">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="stylesheet" href="css/style.css">
@@ -413,6 +414,6 @@
 <script src="js/v2.js"></script>
 <script src="js/zumi.js"></script>
 <script src="js/main.js"></script>
-<script>if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
+<script>if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{});});}</script>
 </body>
 </html>
