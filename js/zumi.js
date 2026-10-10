@@ -47,7 +47,7 @@ function install(V,K){
   const _abs=V.absorbCrash;
   V.absorbCrash=function(o,R){ if(_abs(o,R)) return true; const z=R.zu; if(!z||z.tramp<=0||R.ending>0) return false;
     z.tramp--; o.hit=true; const p=R.p; p.vy=10.5; p.y=.05; p.slide=0; z.act={k:'tramp',t:0,dur:1.3,z:.25,lane:p.lane,move:false};
-    A.sfx('jump',.9,.7); A.voice('zr_trampoline',{exact:true}); const x=K.sx(p.x,0); K.floatText('בּוֹיְנְג!',x,K.BASE-K.LW*2.4,'#bfe8ff',40); K.sparkle(x,K.BASE-K.LW*.4,'#bfe8ff',18);
+    A.sfx('jump',.9,.7); A.voice('zr_trampoline',{exact:true}); const x=K.sx(p.x,0); K.floatText('הוֹפָּה!',x,K.BASE-K.LW*2.4,'#bfe8ff',40); K.sparkle(x,K.BASE-K.LW*.4,'#bfe8ff',18);
     setTimeout(()=>{ if(K.G.state==='run'&&!(A.voiceBusy&&A.voiceBusy())) A.voice('lucky'); },2100); return true; };
   /* gate highlight */
   const _gh=V.gateHint;

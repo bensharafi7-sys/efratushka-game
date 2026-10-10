@@ -1,4 +1,4 @@
-const AVER={welcome:'_r3',letsgo:'_r3',vehicle:'_r3',enc5:'_r3',pet_go:'_r3',welcome2:'_r3',champs:'_r3',ch_win:'_r3',champs_week:'_r3',lb_you:'_r3'}; const vf=v=>v+(AVER[v]||'');
+const AVER={welcome:'_r3',letsgo:'_r3',vehicle:'_r3',enc5:'_r3',pet_go:'_r3',welcome2:'_r3',champs:'_r3',ch_win:'_r3',champs_week:'_r3',lb_you:'_r3',p_panda:'_r3',oops2:'_r3',joke2:'_r3',code_bad:'_r3',zr_trampoline:'_r3',zr_dance_goof:'_r3',zr_thief:'_r3',zr_bday:'_r3',combo:'_r3',thumbs:'_r3'}; const vf=v=>v+(AVER[v]||'');
 /* Audio: WebAudio for sfx/voice/battle; media elements for streamed music */
 'use strict';
 window.EFA = (function(){
