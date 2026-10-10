@@ -30,7 +30,7 @@ const save={
 /* ---------- audio ---------- */
 let ctx=null, master, sfxBus, voiceBus; const raw={}, buf={}, fetching={};
 let muted=own.sound===false; let musicEl=null, musicName=null, musicVol=.38, curVoice=null, voiceEnd=0;
-const AVER={ef_enc5:'_r3',e_k_cream:'_r3',ef_champs:'_r3',z_yay:'_r3',e_sh_end:'_r3',z_t_record:'_r3',z_s_caught:'_r3',z_sh_wrong:'_r3',z_k_yum:'_r3',z_k_sneeze:'_r3',zr_trampoline:'_r3',zr_dance_goof:'_r3',zr_thief:'_r3',zr_bday:'_r3',z_k_photo:'_r3',z_t_spring:'_r3',e_k_intro:'_r3',e_k_stop:'_r3',e_s_caught:'_r3',e_s_intro:'_r3',e_sh_yourturn:'_r3',e_sh_zumiwrong:'_r3',e_t_fall:'_r3',e_t_intro:'_r3'};
+const AVER={ef_enc5:'_r3',e_k_cream:'_r3',ef_champs:'_r3',z_yay:'_r3',e_sh_end:'_r3',z_t_record:'_r4',z_s_caught:'_r4',z_sh_wrong:'_r3',z_k_yum:'_r3',z_k_sneeze:'_r3',zr_trampoline:'_r3',zr_dance_goof:'_r3',zr_thief:'_r3',zr_bday:'_r3',z_k_photo:'_r3',z_t_spring:'_r3',e_k_intro:'_r3',e_k_stop:'_r3',e_s_caught:'_r3',e_s_intro:'_r3',e_sh_yourturn:'_r3',e_sh_zumiwrong:'_r3',e_t_fall:'_r3',e_t_intro:'_r4',e_k_blue:'_r3',e_t_clouds:'_r3',z_t_go:'_r3',ef_almost:'_r3',zr_gate_hint:'_r3',z_s_miss:'_r3',e_k_sprinkles:'_r3',z_s_hide:'_r3',zr_win:'_r3',z_sh_wow:'_r3',z_oops:'_r3',zr_gate_secret:'_r3',ef_oops2:'_r3',z_s_found:'_r3'};
 function url(k){ if(k.startsWith('s_')) return A+'audio/sfx/'+k.slice(2)+'.mp3'; return A+'audio/voice/'+k+(AVER[k]||'')+'.mp3'; }
 function fetchRaw(k){ if(buf[k]||raw[k]) return Promise.resolve(); if(fetching[k]) return fetching[k];
   fetching[k]=fetch(url(k)).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b=>{ raw[k]=b; if(ctx) return decode(k); }).catch(e=>{ console.warn('audio',k,e.message); });

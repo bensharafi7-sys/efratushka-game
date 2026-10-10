@@ -1,4 +1,4 @@
-const AVER={welcome:'_r3',letsgo:'_r3',vehicle:'_r3',enc5:'_r3',pet_go:'_r3',welcome2:'_r3',champs:'_r3',ch_win:'_r3',champs_week:'_r3',lb_you:'_r3',p_panda:'_r3',oops2:'_r3',joke2:'_r3',code_bad:'_r3',zr_trampoline:'_r3',zr_dance_goof:'_r3',zr_thief:'_r3',zr_bday:'_r3',combo:'_r3',thumbs:'_r3'}; const vf=v=>v+(AVER[v]||'');
+const AVER={welcome:'_r3',letsgo:'_r3',vehicle:'_r3',enc5:'_r3',pet_go:'_r3',welcome2:'_r3',champs:'_r3',ch_win:'_r4',champs_week:'_r3',lb_you:'_r3',p_panda:'_r3',oops2:'_r3',joke2:'_r3',code_bad:'_r3',zr_trampoline:'_r3',zr_dance_goof:'_r3',zr_thief:'_r3',zr_bday:'_r3',combo:'_r3',thumbs:'_r4',challenge:'_r3',q_pattern:'_r3',a_cat:'_r3',clap_ok:'_r3',teach_ok:'_r3',saved:'_r3',rest:'_r3',almost:'_r3',fly:'_r3',zr_gate_hint:'_r3',egg_found:'_r3',album:'_r3',teach:'_r3',shiny:'_r3',pet_cute:'_r3',city_color:'_r3',sticker:'_r3',lucky:'_r3',p_kitten:'_r3',kiss:'_r3',zr_win:'_r3',h_independence:'_r3',zr_gate_secret:'_r3'}; const vf=v=>v+(AVER[v]||'');
 /* Audio: WebAudio for sfx/voice/battle; media elements for streamed music */
 'use strict';
 window.EFA = (function(){
