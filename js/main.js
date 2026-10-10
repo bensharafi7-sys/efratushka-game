@@ -280,7 +280,7 @@ function launchGate(){
   const g=R.gate; g.phase='go'; g.z=FAR-2; g.t=0;
   showQuiz(null,g.q);
   let d=0;
-  if(g.q.voice) d=A.voice(g.q.voice); else if(R.firstGate){ d=A.voice('gate'); }
+  if(g.q.voice) d=A.voice(g.q.voice); else if(g.q.eq) d=A.voice('q_math'); else if(R.firstGate){ d=A.voice('gate'); }
   R.firstGate=false;
 }
 function showQuiz(preHtml,q){
@@ -474,7 +474,8 @@ function drawGate(g){
     for(let k=0;k<6;k++){ ctx.strokeStyle=cols[k]; ctx.beginPath(); ctx.arc(cx,by-px*1.55,px*(.47-k*.045),Math.PI,0); ctx.stroke(); }
     ctx.fillStyle='#fff'; ctx.fillRect(cx-px*.49,by-px*1.55,px*.07,px*1.55); ctx.fillRect(cx+px*.42,by-px*1.55,px*.07,px*1.55);
     // sign
-    const sz=px*.86, sy2=by-px*2.05-sz/2; let sc=1;
+    const sz=px*1.0, sy2=by-px*2.05-sz/2;
+    ctx.fillStyle='#7a1fa2'; rrect(ctx,cx-sz/2-px*.05,sy2-sz/2-px*.05,sz+px*.1,sz+px*.1,sz*.2); ctx.fill(); let sc=1;
     if(V&&V.gateHint(R,i)){ ctx.save(); ctx.globalAlpha=.45+.35*Math.sin(G.t*10); ctx.fillStyle='#fff59a'; ctx.beginPath(); ctx.arc(cx,sy2,sz*.72,0,TAU); ctx.fill(); ctx.restore(); }
     if(R.reveal&&false) sc=1;
     ctx.drawImage(g.q.tex[i],cx-sz*sc/2,sy2-sz*sc/2,sz*sc,sz*sc);
@@ -499,6 +500,24 @@ function drawBanner(){ // birthday arch
   const txt='מזל טוב '+BDAY.name+'!'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.direction='rtl'; fitText(ctx,txt,bw*.92,bh*.62); ctx.fillStyle='#d4157f'; ctx.fillText(txt,(x1+x2)/2,bt+bh*.54);
   if(V&&V.hasPhoto()){ V.drawFace(ctx,x1,bt+bh*.4,px*.62); V.drawFace(ctx,x2,bt+bh*.4,px*.62); } else { balloon(ctx,x1,bt-px*.1,px*.25,'#ffd23f',0); balloon(ctx,x2,bt-px*.1,px*.25,'#3fd4ff',0); }
 }
+function drawGateCards(){
+  const g=R.gate; if(!g||g.phase!=='go'||g.z==null) return;
+  const z=g.z, a=clamp((z-.6)/2.2,0,1)*clamp(g.t/.35,0,1); if(a<=0) return;
+  const qe=$('#quiz'); const top=qe.classList.contains('hidden')?0:qe.getBoundingClientRect().bottom-cvs.getBoundingClientRect().top;
+  const sz=Math.min(LW*proj(2)*.84,132,Math.max(64,HOR-top-14));
+  const cy=Math.max(top+8+sz/2,HOR-sz/2-8);
+  ctx.save(); ctx.globalAlpha=a;
+  for(let i=0;i<3;i++){
+    const lx=i-1, cx=sx(lx,2), gx=sx(lx,z), s=proj(z), gy=sy(z)-LW*s*2.05;
+    ctx.setLineDash([6,6]); ctx.lineWidth=3; ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.beginPath(); ctx.moveTo(cx,cy+sz/2); ctx.lineTo(gx,gy); ctx.stroke(); ctx.setLineDash([]);
+    const pul=1+.04*Math.sin(G.t*6+i);
+    const w=sz*pul; ctx.shadowColor='rgba(60,0,90,.55)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4;
+    rrect(ctx,cx-w/2-5,cy-w/2-5,w+10,w+10,w*.2); ctx.fillStyle='#7a1fa2'; ctx.fill(); ctx.shadowColor='transparent';
+    ctx.drawImage(g.q.tex[i],cx-w/2,cy-w/2,w,w);
+    if(V&&V.gateHint(R,i)){ ctx.lineWidth=5; ctx.strokeStyle=`rgba(255,245,154,${.5+.4*Math.sin(G.t*10)})`; rrect(ctx,cx-w/2-9,cy-w/2-9,w+18,w+18,w*.22); ctx.stroke(); }
+  }
+  ctx.restore();
+}
 function renderRun(){
   const w=R.world; layout();
   ctx.save(); if(shake>0){ ctx.translate(rnd(-1,1)*shake*14,rnd(-1,1)*shake*10); }
@@ -518,6 +537,7 @@ function renderRun(){
   if(!drewPlayer) drawPlayerGroup();
   drawParts();
   ctx.restore();
+  drawGateCards();
   if(V) V.postRender(R);
   if(R.ending>0){ ctx.fillStyle=`rgba(255,255,255,${clamp((R.ending-1)/.8,0,1)})`; ctx.fillRect(0,0,W,H); }
 }

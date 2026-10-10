@@ -304,3 +304,10 @@ input#bdName:focus{border-color:#ff4fa8}
 @keyframes bkglow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12)}}
 .bkphone{font-size:clamp(28px,8vw,40px);font-weight:900;color:#7a1fa2;text-align:center;margin:6px 0 12px;letter-spacing:1px}
 #scrBook .btn.big{display:block;text-align:center;text-decoration:none;margin:8px auto;max-width:360px}
+
+/* gate v4: compact question strip at the top; answers shown big above the lanes (canvas) */
+.quiz{top:calc(max(6px,env(safe-area-inset-top)) + 84px);left:0;right:0;margin:0 auto;transform:none;width:fit-content;max-width:min(94vw,560px);background:rgba(255,255,255,.78);border-radius:16px;padding:3px 14px 4px;box-shadow:0 3px 0 rgba(122,31,162,.25),0 0 0 2px #ffcf3f;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:none}
+.quiz .qtitle,.quiz .qhint,.quiz .qopts{display:none}
+.quiz .qtext{font-size:clamp(18px,5vw,26px);line-height:1.15}
+.quiz .qseq canvas{width:30px;height:30px}
+.quiz .qseq b{font-size:26px}
