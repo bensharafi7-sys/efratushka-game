@@ -31,7 +31,7 @@
     <div class="logo"><span class="l1">אפרתושקה</span><span class="l2">מסיבת הקסם ✨</span></div>
     <div class="loadwrap"><div class="bar"><i id="loadBar"></i></div><div id="loadTxt">טוענים את המסיבה…</div></div>
     <div id="bdayInvite" class="invite hidden"></div>
-    <button id="btnStart" class="btn big pink hidden">יאללה מתחילים! 🎉</button>
+    <button id="btnStart" class="btn big pink hidden">קדימה מתחילים! 🎉</button>
   </section>
 
   <!-- MENU -->
@@ -64,6 +64,7 @@
         <button class="tile" id="btnWardrobe"><img src="assets/img/front.webp" alt="" class="ef"><span>ארון בגדים</span></button>
         <button class="tile" id="tDance"><img src="assets/v2/dec_dj.webp" alt=""><span>שיעור ריקוד</span></button>
         <button class="tile" id="btnBday"><img src="assets/v2/dec_cake.webp" alt=""><span>יום הולדת</span></button>
+        <button class="tile booktile" id="tBook"><b class="bkic">🎤</b><span class="bkt">הזמנת מופע לאירועים<small id="bkPhone">050-2222559</small></span><b class="bkgo">📞 💬</b></button>
       </div>
       <div class="agebox">
         <div class="agetitle">בן/בת כמה השחקן?</div>
@@ -294,6 +295,18 @@
     </div>
   </section>
 
+  <!-- BOOKING (behind parent gate) -->
+  <section id="scrBook" class="screen panelscr">
+    <div class="panel">
+      <h2>🎤 הזמנת מופע לאירועים</h2>
+      <p class="sub">אפרתושקה מגיעה ליום הולדת, לגן ולכל אירוע! 🎉</p>
+      <div class="bkphone" dir="ltr" id="bkNum">050-2222559</div>
+      <a id="bkCall" class="btn big pink" href="tel:+972502222559">📞 התקשרו עכשיו</a>
+      <a id="bkWa" class="btn big green" target="_blank" rel="noopener noreferrer" href="https://wa.me/972502222559">💬 שלחו הודעה בוואטסאפ</a>
+      <button class="btn mid gray back" data-back>⬅ חזרה</button>
+    </div>
+  </section>
+
   <!-- PARENTS -->
   <section id="scrParents" class="screen panelscr">
     <div class="panel wide">
@@ -414,6 +427,6 @@
 <script src="js/v2.js"></script>
 <script src="js/zumi.js"></script>
 <script src="js/main.js"></script>
-<script>if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{});});}</script>
+<script>if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{scope:'./',updateViaCache:'none'}).then(r=>{try{r.update();}catch(e){}}).catch(()=>{});let rl=false;const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{const s=document.getElementById('btnStart');if(!hadCtl||rl||(s&&s.disabled))return;rl=true;location.reload();});});}</script>
 </body>
 </html>

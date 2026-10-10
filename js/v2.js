@@ -767,7 +767,7 @@ V.stickerReveal=function(sg){ if(!sg) return; reveal({title:sg.shiny?'מדבקה
 
 /* ----- tiles wiring ----- */
 const T=(id,fn)=>{ const b=$('#'+id); if(b) b.addEventListener('click',()=>{ A.unlock(); A.sfx('coin',.35,1.15); fn(); }); };
-T('tMissions',()=>questScreen('m')); T('tJourney',()=>questScreen('j')); T('tPets',petsScreen); T('tCity',cityScreen); T('tShop',shopScreen); T('tAlbum',albumScreen); T('tWheel',wheelScreen); T('tDance',()=>lessonScreen()); T('btnProfile',()=>profileScreen()); T('btnParents',()=>parentGate(parentsScreen));
+T('tMissions',()=>questScreen('m')); T('tJourney',()=>questScreen('j')); T('tPets',petsScreen); T('tCity',cityScreen); T('tShop',shopScreen); T('tAlbum',albumScreen); T('tWheel',wheelScreen); T('tDance',()=>lessonScreen()); T('btnProfile',()=>profileScreen()); T('btnParents',()=>parentGate(parentsScreen)); T('tBook',()=>parentGate(bookScreen));
 V.screens={questScreen,petsScreen,cityScreen,shopScreen,albumScreen,wheelScreen,lessonScreen,profileScreen,parentsScreen,cardScreen,showRest};
 V.render=function(dt){ const s=K.G.state; if(s==='city'){ V.renderCity(dt); return true; } if(s==='lesson'){ V.renderLesson(dt); return true; } if(s==='menu'&&$('#scrWheel').classList.contains('show')&&!wSpin&&Math.random()<.2) drawWheel(); return false; };
 V.X=X; V.PETS=PETS; V.cityPlot=i=>plotPos(i); V.cityStage=n=>{ if(n!=null){ cs=n; cityUI(); } return cs; }; V.lessonState=()=>L&&{phase:L.phase,seq:L.seq.slice(),idx:L.idx,round:L.round}; V.addEgg=addEgg; V.grantSticker=grantSticker; V.ensureMissions=ensureMissions;
@@ -943,6 +943,8 @@ async function install(){ A.voice('install',{exact:true}); if(deferredPrompt){ d
   $('#instIOS').classList.toggle('hidden',!isIOS()); $('#instOther').classList.toggle('hidden',isIOS()); open('scrInstall'); }
 instUpd();
 
+function bkInfo(){ const s=(window.EFCFG||{}).social||{}; const wa=String(s.whatsapp||'972502222559').replace(/[^0-9]/g,''); return {wa,phone:s.phone||'050-2222559',tel:s.tel||('+'+wa),text:s.bookingText||'היי אפרתושקה! 🎉 הגעתי מהמשחק ואשמח לפרטים על מופע ליום הולדת / אירוע.'}; }
+function bookScreen(){ const b=bkInfo(); $('#bkNum').textContent=b.phone; $('#bkCall').href='tel:'+b.tel; $('#bkWa').href='https://wa.me/'+b.wa+'?text='+encodeURIComponent(b.text); open('scrBook'); }
 /* ---- social / show booking (config-driven, shown only when filled, parents area only) ---- */
 function socialUpd(){ const s=CFG.social||{}; const box=$('#parSocial'); if(!box) return; const links=[['facebook','פייסבוק'],['tiktok','טיקטוק'],['instagram','אינסטגרם'],['youtube','יוטיוב']].filter(([k])=>/^https:\/\//.test(s[k]||''));
   const wa=String(s.whatsapp||'').replace(/[^0-9]/g,''); const row=$('#parSocialRow'); row.innerHTML='';

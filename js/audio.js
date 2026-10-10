@@ -1,3 +1,4 @@
+const AVER={welcome:'_r3',letsgo:'_r3',vehicle:'_r3',enc5:'_r3',pet_go:'_r3',welcome2:'_r3',champs:'_r3',ch_win:'_r3',champs_week:'_r3',lb_you:'_r3'}; const vf=v=>v+(AVER[v]||'');
 /* Audio: WebAudio for sfx/voice/battle; media elements for streamed music */
 'use strict';
 window.EFA = (function(){
@@ -15,7 +16,7 @@ let cur=null, curName=null, mode=null, rotIdx=0, fading=[];
 async function fetchBin(url){const r=await fetch(url); if(!r.ok) throw new Error(url+' '+r.status); return r.arrayBuffer();}
 function preload(onProgress){
   const jobs=[];
-  VOICES.forEach(v=>jobs.push(['v_'+v,'assets/audio/voice/'+v+'.mp3']));
+  VOICES.forEach(v=>jobs.push(['v_'+v,'assets/audio/voice/'+vf(v)+'.mp3']));
   SFX.forEach(v=>jobs.push(['s_'+v,'assets/audio/sfx/'+v+'.mp3']));
   jobs.push(['battle','assets/audio/music/battle.mp3']);
   return jobs.map(([k,u])=>fetchBin(u).then(b=>{ if(k==='battle') battleRaw=b; else raw[k]=b; onProgress&&onProgress(); }).catch(e=>{console.warn('audio load',k,e.message); onProgress&&onProgress();}));
@@ -59,7 +60,7 @@ function playBuf(k,bus,vol,rate){
 }
 function sfx(n,vol,rate){ return playBuf('s_'+n,sfxBus,vol,rate); }
 let v2loading=null;
-function loadV2(){ if(v2loading) return v2loading; v2loading=(async()=>{ for(const v of V2){ const k='v_'+v; if(raw[k]||buf[k]) continue; try{ raw[k]=await fetchBin('assets/audio/voice/'+v+'.mp3'); if(ctx) await decodeOne(k); }catch(e){} } })(); return v2loading; }
+function loadV2(){ if(v2loading) return v2loading; v2loading=(async()=>{ for(const v of V2){ const k='v_'+v; if(raw[k]||buf[k]) continue; try{ raw[k]=await fetchBin('assets/audio/voice/'+vf(v)+'.mp3'); if(ctx) await decodeOne(k); }catch(e){} } })(); return v2loading; }
 const VARS={great:['great','enc1','enc2','enc4','enc7'],amazing:['amazing','enc3','enc5','enc4'],champs:['champs','enc6','enc3','enc5'],oops:['oops','oops2','oops3'],almost:['almost','oops2','oops3'],gate:['gate','gate_soon']};
 const lastVar={};
 function variant(n){ const l=VARS[n]; if(!l) return n; let c, g=0; do{ c=l[Math.floor(Math.random()*l.length)]; }while(c===lastVar[n]&&g++<8); lastVar[n]=c; return c; }
@@ -67,7 +68,7 @@ function voice(n,opts){
   opts=opts||{}; if(!opts._lazy&&!opts.exact) n=variant(n);
   if(!ctx) return 0;
   const k='v_'+n;
-  if(!buf[k]&&V2.includes(n)&&!opts._lazy){ const t0=performance.now(); (raw[k]?Promise.resolve():fetchBin('assets/audio/voice/'+n+'.mp3').then(b=>{ if(!buf[k]) raw[k]=b; })).then(()=>decodeOne(k)).then(()=>{ if(buf[k]&&performance.now()-t0<2500) voice(n,Object.assign({},opts,{_lazy:true})); }).catch(()=>{}); return 0; }
+  if(!buf[k]&&V2.includes(n)&&!opts._lazy){ const t0=performance.now(); (raw[k]?Promise.resolve():fetchBin('assets/audio/voice/'+vf(n)+'.mp3').then(b=>{ if(!buf[k]) raw[k]=b; })).then(()=>decodeOne(k)).then(()=>{ if(buf[k]&&performance.now()-t0<2500) voice(n,Object.assign({},opts,{_lazy:true})); }).catch(()=>{}); return 0; }
   if(curVoice && !opts.overlap){ try{curVoice.stop();}catch(e){} curVoice=null; }
   const s=playBuf('v_'+n,voiceBus,1);
   if(!s) return 0;

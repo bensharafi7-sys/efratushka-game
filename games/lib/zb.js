@@ -30,7 +30,8 @@ const save={
 /* ---------- audio ---------- */
 let ctx=null, master, sfxBus, voiceBus; const raw={}, buf={}, fetching={};
 let muted=own.sound===false; let musicEl=null, musicName=null, musicVol=.38, curVoice=null, voiceEnd=0;
-function url(k){ if(k.startsWith('s_')) return A+'audio/sfx/'+k.slice(2)+'.mp3'; return A+'audio/voice/'+k+'.mp3'; }
+const AVER={ef_enc5:'_r3',e_k_cream:'_r3',ef_champs:'_r3',z_yay:'_r3'};
+function url(k){ if(k.startsWith('s_')) return A+'audio/sfx/'+k.slice(2)+'.mp3'; return A+'audio/voice/'+k+(AVER[k]||'')+'.mp3'; }
 function fetchRaw(k){ if(buf[k]||raw[k]) return Promise.resolve(); if(fetching[k]) return fetching[k];
   fetching[k]=fetch(url(k)).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b=>{ raw[k]=b; if(ctx) return decode(k); }).catch(e=>{ console.warn('audio',k,e.message); });
   return fetching[k]; }
