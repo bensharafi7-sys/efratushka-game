@@ -36,7 +36,7 @@ async function cheat(){ /* Zumi sneaks the prize to another box – visible hop 
 async function play(){ busy=true; round++; hud(); boxes.forEach(b=>b.el.classList.remove('up','glow'));
   if(age>=5&&round===3&&n<maxN()) { n++; build(); }
   const p=$('#prize'); p.textContent=pick(PRIZES); prizeBox=rint(0,n-1); placePrize(); p.style.opacity=1;
-  msg('זומי מחביא את ההפתעה...'); zu.playOnce('z_dance','z_idle',24);
+  msg('זומי בומי מחביא את ההפתעה...'); zu.playOnce('z_dance','z_idle',24);
   /* show the prize, lift the box above it */
   boxes[prizeBox].el.classList.add('up'); sfx('powerup',.5); if(round===1) await chain(['e_s_intro','z_s_hide']); else { if(Math.random()<.5) say('z_s_hide'); await wait(1300); }
   boxes[prizeBox].el.classList.remove('up'); await wait(450); p.style.opacity=0;
@@ -61,7 +61,7 @@ async function choose(b){ if(busy) return; busy=true; ZB.unlock(); placePrize();
 function maxN(){ return age<=4?3:age<=6?4:age<=8?5:6; }
 async function end(){ const stars=score+(score===ROUNDS?3:0); if(stars) ZB.award(stars);
   const g=save.game('surprise'); g.plays=(g.plays|0)+1; if(score>(g.best|0)) g.best=score; save.saveOwn();
-  $('#endEmoji').textContent=score===ROUNDS?'🏆':score>=3?'🎁':'🙃'; $('#endTitle').textContent=score===ROUNDS?'עיניים של נשר!':score>=3?'כל הכבוד!':'זומי ניצח הפעם...';
+  $('#endEmoji').textContent=score===ROUNDS?'🏆':score>=3?'🎁':'🙃'; $('#endTitle').textContent=score===ROUNDS?'עיניים של נשר!':score>=3?'כל הכבוד!':'זומי בומי ניצח הפעם...';
   $('#endSub').textContent='מצאתם '+score+' מתוך '+ROUNDS+' הפתעות'; $('#endStars').textContent='+'+stars+' ⭐';
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('show',s.id==='scrEnd'));
   if(score===ROUNDS){ ZB.rain(100); await say('ef_champs'); } else if(score>=3) await say('z_yay'); else await say('ef_oops2'); }

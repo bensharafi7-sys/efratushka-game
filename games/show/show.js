@@ -28,7 +28,7 @@ async function flash(i,d,who){ const b=$('#pads').children[i]; if(!b) return; b.
 function pop(e){ const p=$('#bigPop'); p.textContent=e; p.classList.add('on'); clearTimeout(pop.t); pop.t=setTimeout(()=>p.classList.remove('on'),260); }
 function spot(w){ $('#spotE').classList.toggle('on',w==='e'); $('#spotZ').classList.toggle('on',w==='z'); }
 async function demo(){ spot('e'); setStatus('👀 אפרתושקה מראה...'); inputIdx=0; dots(); await wait(350); for(const i of seq){ if(!running) return; await flash(i,speed,'e'); } spot(null); }
-async function zumiTry(){ spot('z'); setStatus('🤪 זומי מנסה...'); zumiCount++; await say('z_sh_try');
+async function zumiTry(){ spot('z'); setStatus('🤪 זומי בומי מנסה...'); zumiCount++; await say('z_sh_try');
   const wrongAt=rint(Math.max(0,seq.length-2),seq.length-1);
   for(let k=0;k<seq.length;k++){ if(!running) return; let i=seq[k]; if(k===wrongAt){ i=(i+rint(1,nPads-1))%nPads; await flash(i,speed*.9,'z'); sfx('wrong'); zu.playOnce('z_oops','z_idle',30); $('#zu').animate([{transform:'rotate(0)'},{transform:'rotate(-14deg)'},{transform:'rotate(10deg)'},{transform:'rotate(0)'}],{duration:600}); break; } await flash(i,speed*.9,'z'); }
   spot(null); await wait(250); await chain(['z_sh_wrong','e_sh_zumiwrong']); if(age<=5){ await demo(); } }
@@ -56,7 +56,7 @@ async function mistake(){ sfx('wrong'); hearts--; hud(); $('#pads').classList.ad
 async function end(win){ running=false; busy=true; setStatus(''); $('#seqDots').innerHTML=''; const stars=Math.min(15,completed+(win?3:0)); if(stars>0) ZB.award(stars);
   const g=save.game('show'); g.plays=(g.plays|0)+1; if(completed>(g.best|0)) g.best=completed; save.saveOwn();
   $('#endEmoji').textContent=win?'🏆':'🎭'; $('#endTitle').textContent=win?'איזה מופע!':'סוף המופע!';
-  $('#endSub').textContent=win?'עשיתם '+completed+' ריקודים מושלמים!':'הצלחתם '+completed+' ריקודים. זומי עדיין לומד...';
+  $('#endSub').textContent=win?'עשיתם '+completed+' ריקודים מושלמים!':'הצלחתם '+completed+' ריקודים. זומי בומי עדיין לומד...';
   $('#endStars').textContent='+'+stars+' ⭐';
   if(win){ ZB.rain(120); cheer(); ef.set('e_celebrate'); zu.set('z_celebrate'); ZB.music('disco'); await say('e_sh_end'); await say('z_yay'); }
   else { await say(pick(['ef_oops2','ef_almost'])); }

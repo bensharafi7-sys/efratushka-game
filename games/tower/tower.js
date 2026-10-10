@@ -73,7 +73,7 @@ function start(m){ ZB.unlock(); mode=m; age=save.age||5; resize();
 }
 function updDuo(){ if(duo) $('#duoTag').textContent=P.ch==='z'?'🎁 קופץ: זומי בומי':'🎀 קופצת: אפרתושקה'; }
 function swap(manual){ P.ch=P.ch==='z'?'e':'z'; P.h=P.ch==='z'?104:112; efr.ch=P.ch==='z'?'e':'z'; updDuo(); sfx('powerup');
-  confetti(null,null,30); toast(P.ch==='z'?'תור של זומי! 🎁':'תור של אפרתושקה! 🎀'); if(!ZB.voiceBusy()) say(P.ch==='z'?'z_t_go':'e_t_myturn'); }
+  confetti(null,null,30); toast(P.ch==='z'?'תור של זומי בומי! 🎁':'תור של אפרתושקה! 🎀'); if(!ZB.voiceBusy()) say(P.ch==='z'?'z_t_go':'e_t_myturn'); }
 function hud(){ $('#hFloor').textContent='🏢 '+floor; $('#hStars').textContent='⭐ '+starsGot; $('#hSaves').textContent=saves>0?'🎈'.repeat(saves):'—'; }
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('show',s.id===id)); }
 function bounce(v,pl){ P.vy=v; P.bounceT=0; if(pl){ pl.sq=1; } }
@@ -215,7 +215,7 @@ async function shareCard(){ const W=1080,H=1350, k=document.createElement('canva
   x.fillStyle='#ff2d95'; x.font='900 150px Rubik,sans-serif'; x.fillText('קומה '+floor+'!',W/2,330);
   const sp=SP.z_celebrate||SP.z_idle; const nm=SP.z_celebrate?'z_celebrate':'z_idle'; if(sp){ const fr=Math.floor(sp.n*.6); ZB.drawSprite(x,nm,fr,W/2,H-150,760,false); ZBC.drawOn(x,nm,fr,W/2,H-150,760,false,0); }
   if(imgs.efrat_face){ x.save(); x.beginPath(); x.arc(W-190,H-330,120,0,7); x.fillStyle='#fff'; x.fill(); x.clip(); x.drawImage(imgs.efrat_face,W-310,H-450,240,240); x.restore(); }
-  x.fillStyle='#fff'; x.font='800 54px Rubik,sans-serif'; x.fillText((mode==='daily'?'📅 מגדל היום ':'')+'קפצתי עם אפרתושקה וזומי! 🎈',W/2,H-60);
+  x.fillStyle='#fff'; x.font='800 54px Rubik,sans-serif'; x.fillText((mode==='daily'?'📅 מגדל היום ':'')+'קפצתי עם אפרתושקה וזומי בומי! 🎈',W/2,H-60);
   const r=await ZB.shareCanvas(k,'zumi-tower-'+floor+'.png','קפצתי לקומה '+floor+' במגדל ההפתעות של זומי בומי! 🎁'); if(r==='download') toast('📸 הכרטיס נשמר!'); }
 /* ---------- boot ---------- */
 ZB.topbar({back:'../hub/',onAge:a=>{ age=a; }});
