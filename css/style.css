@@ -287,3 +287,10 @@ input#bdName:focus{border-color:#ff4fa8}
 .row.wrap{flex-wrap:wrap;justify-content:center}
 .btn.soc{flex:0 0 auto;text-decoration:none;color:#fff;background:linear-gradient(#a35cff,#7b2ff2)}
 #parBook{text-decoration:none;color:#fff;display:block;text-align:center}
+/* זומי בומי – more games button */
+.zumiBtn{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;margin:2px 0 8px;padding:6px 12px 6px 8px;border-radius:22px;text-decoration:none;color:#fff;font-weight:900;font-size:clamp(16px,4.6vw,20px);background:linear-gradient(135deg,#3fb8ff,#7b2ff2);box-shadow:0 5px 0 #4b148f,0 0 0 3px rgba(255,255,255,.75) inset;animation:zbWig 4s ease-in-out infinite}
+.zumiBtn img{width:46px;height:46px;border-radius:50%;background:#c9eaff;object-fit:cover;flex:none;border:3px solid #fff}
+.zumiBtn span{flex:1;text-align:center;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.zumiBtn b{font-size:24px}
+.zumiBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #4b148f}
+@keyframes zbWig{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-2deg)}94%{transform:rotate(2deg)}97%{transform:rotate(-1deg)}}

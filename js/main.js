@@ -603,6 +603,7 @@ function renderBattle(){
   else drawFrame('dance',(B&&B.started?now:t)*12.5,W*.3,baseY-bounce,efH);
   if(V&&V.hasBuddy()&&V.drawPhotoSign) V.drawPhotoSign(ctx,W*.5,baseY-efH*.95,efH*.3,t);
   const thH=H*.22, th=pulse*.08; ctx.save(); ctx.translate(W*.73,baseY); ctx.rotate(Math.sin(now*Math.PI/BEAT)*.08); ctx.scale(1-th*.5,1+th); drawThiefSprite(0,0,thH,t,w.boss.acc); ctx.restore();
+  if(V&&V.drawBattleZumi) V.drawBattleZumi(ctx,W*.5,baseY+H*.035,efH,now,t,B);
   // speech bubble when thief "wins" a note
   if(B&&B.ef==='oops'){ ctx.font='900 22px Rubik'; ctx.textAlign='center'; ctx.fillStyle='#fff'; rrect(ctx,W*.73-52,baseY-thH-44,104,36,16); ctx.fill(); ctx.fillStyle='#7a1fa2'; ctx.fillText('הי הי!',W*.73,baseY-thH-21); }
   // highway

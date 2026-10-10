@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ff5fb4">
+<title>זומי בומי: מגדל ההפתעות</title>
+<link rel="icon" href="../lib/assets/img/zumi_face.webp">
+<link rel="stylesheet" href="../lib/zb.css">
+<style>
+#ui{position:absolute;inset:0;pointer-events:none;z-index:10}
+#hud{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 54px);right:12px;left:12px;display:flex;gap:8px;justify-content:space-between;pointer-events:none}
+#hud .pill{font-size:17px}
+#saves{letter-spacing:2px}
+#ctl{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+#ctl button{pointer-events:auto;width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.55);font-size:40px;font-weight:900;color:#7a1fa2;box-shadow:0 4px 0 rgba(0,0,0,.2);touch-action:none}
+#ctl button.on{background:rgba(255,255,255,.95)}
+#midBtns{display:flex;gap:8px;align-items:center}
+#midBtns button{width:56px;height:56px;font-size:24px}
+.modeCards{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin:6px 0}
+.mcard{font-family:inherit;border:0;border-radius:20px;padding:10px 6px;background:#fff;box-shadow:0 5px 0 rgba(0,0,0,.18);font-weight:900;font-size:18px;color:#7a1fa2;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.mcard small{font-weight:700;font-size:13px;color:#9a5ab8}
+.mcard.daily{background:linear-gradient(#fff6c9,#ffe27a)}
+.mcard.duo{background:linear-gradient(#e3f4ff,#bfe6ff)}
+.mcard .ic{font-size:30px}
+#startZumi{height:min(30vh,240px);margin:4px auto 0;background-repeat:no-repeat}
+#costGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;margin:8px 0}
+#costGrid button{font-family:inherit;border:3px solid #f0dcf8;background:#fff;border-radius:16px;padding:4px;cursor:pointer;height:64px}
+#costGrid button.on{border-color:#ff4fa8;background:#ffe0f3}
+#costGrid canvas{width:100%;height:100%}
+#costPrev{width:180px;height:200px}
+.tabs{display:flex;gap:6px;width:100%}
+.tab{font-family:inherit;flex:1;border:0;border-radius:14px;padding:9px 4px;font-weight:800;font-size:16px;background:#f0dcf8;color:#7a1fa2;cursor:pointer}
+.tab.on{background:#ff4fa8;color:#fff}
+#lever{font-size:18px}
+.res-row{display:flex;gap:10px;justify-content:center;font-weight:900;font-size:20px;color:#7a1fa2;margin:2px 0}
+#duoTag{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 96px);left:50%;transform:translateX(-50%);pointer-events:none}
+#zbBubbles{bottom:calc(max(14px,env(safe-area-inset-bottom)) + 96px)}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv" class="game"></canvas>
+  <div id="ui" class="hidden">
+    <div id="hud"><div class="pill" id="hFloor">🏢 0</div><div class="pill" id="hSaves">🎈</div><div class="pill" id="hStars">⭐ 0</div></div>
+    <div id="duoTag" class="pill hidden"></div>
+    <div id="ctl">
+      <button id="bRight" aria-label="ימינה">▶</button>
+      <div id="midBtns"><button class="iconbtn hidden" id="bSwap" aria-label="החלפה">🔄</button><button class="iconbtn" id="bTilt" aria-label="הטיה">📱</button></div>
+      <button id="bLeft" aria-label="שמאלה">◀</button>
+    </div>
+  </div>
+
+  <section id="scrStart" class="screen show">
+    <div style="height:56px"></div>
+    <div class="logo"><span class="l1">זומי בומי</span><span class="l2">מגדל ההפתעות 🎁</span></div>
+    <div id="startZumi"></div>
+    <div class="modeCards">
+      <button class="mcard" id="mClassic"><span class="ic">🎁</span>קפיצה רגילה<small id="bestTxt">שיא: 0</small></button>
+      <button class="mcard daily" id="mDaily"><span class="ic">📅</span>מגדל היום<small id="dailyTxt">אתגר יומי</small></button>
+      <button class="mcard duo" id="mDuo"><span class="ic">👫</span>מצב זוגי<small>זומי ↔ אפרתושקה</small></button>
+      <button class="mcard" id="mCostume"><span class="ic">🎩</span>מכונת תחפושות<small>כובעים, פפיונים, משקפיים</small></button>
+    </div>
+    <p class="hint">הטו את הטלפון או לחצו ◀ ▶ (במחשב: חיצים)</p>
+  </section>
+
+  <section id="scrCostume" class="screen panelscr">
+    <div class="panel">
+      <h2>🎩 מכונת התחפושות</h2>
+      <canvas id="costPrev" width="360" height="400"></canvas>
+      <button class="btn mid purple" id="lever">🎰 משיכה במנוף!</button>
+      <div class="tabs"><button class="tab on" data-k="hat">כובעים</button><button class="tab" data-k="bow">פפיונים</button><button class="tab" data-k="glasses">משקפיים</button></div>
+      <div id="costGrid"></div>
+      <button class="btn mid pink" id="costDone">מוכן! ✓</button>
+    </div>
+  </section>
+
+  <section id="scrOver" class="screen panelscr">
+    <div class="panel">
+      <div class="big-emoji" id="ovEmoji">🎉</div>
+      <h2 id="ovTitle">איזו קפיצה!</h2>
+      <div class="res-row"><span id="ovFloor">קומה 0</span><span id="ovBest"></span></div>
+      <div class="starsWon" id="ovStars">+0 ⭐</div>
+      <button class="btn big pink pulse" id="ovRetry">🔁 עוד פעם!</button>
+      <div class="row"><button class="btn mid teal" id="ovShare">📸 כרטיס שיא</button><button class="btn mid gray" id="ovMenu">🏠 תפריט</button></div>
+    </div>
+  </section>
+</div>
+<script src="../lib/voices.js"></script>
+<script src="../lib/zb.js"></script>
+<script src="../lib/costume.js"></script>
+<script src="tower.js"></script>
+</body>
+</html>

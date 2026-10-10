@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#7b2ff2">
+<title>המופע הגדול – אפרתושקה וזומי בומי</title>
+<link rel="icon" href="../lib/assets/img/zumi_face.webp">
+<link rel="stylesheet" href="../lib/zb.css">
+<style>
+#app{background:radial-gradient(ellipse at 50% 0%,#5b2bd6 0%,#2a0f5e 55%,#14062f 100%)}
+#curtL,#curtR{position:absolute;top:0;width:16%;height:58%;background:repeating-linear-gradient(90deg,#c4123f 0 14px,#a50d33 14px 28px);box-shadow:inset 0 -14px 20px rgba(0,0,0,.35);z-index:1;border-bottom-right-radius:60% 20%}
+#curtL{left:0;border-bottom-left-radius:0}#curtR{right:0;border-bottom-left-radius:60% 20%;border-bottom-right-radius:0}
+#valance{position:absolute;top:0;left:0;right:0;height:34px;background:repeating-radial-gradient(circle at 20px -6px,#e01a4f 0 26px,#a50d33 26px 30px);z-index:2}
+.spot{position:absolute;top:0;width:46%;height:58%;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,220,.0),rgba(255,255,200,.0));clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);background:linear-gradient(rgba(255,250,200,.35),rgba(255,250,200,0));opacity:.0;transition:opacity .25s;z-index:1;pointer-events:none}
+.spot.on{opacity:1}
+#spotE{right:6%}#spotZ{left:6%}
+#stage{position:absolute;left:0;right:0;top:12%;height:44%;z-index:3}
+#stageImg{position:absolute;left:50%;bottom:-6%;width:96%;transform:translateX(-50%);pointer-events:none}
+.char{position:absolute;bottom:9%;height:72%;background-repeat:no-repeat;filter:drop-shadow(0 6px 6px rgba(0,0,0,.35))}
+#ef{right:9%}#zu{left:9%}
+#crowd{position:absolute;left:0;right:0;top:53.5%;height:7%;display:flex;justify-content:space-around;align-items:flex-end;z-index:4;font-size:min(8.5vw,5dvh)}
+#crowd span{display:inline-block;transition:transform .18s}
+#crowd.cheer span{animation:cj .35s ease-in-out 3 alternate}
+@keyframes cj{to{transform:translateY(-40%) rotate(-8deg)}}
+#pads{position:absolute;left:4%;right:4%;top:67%;bottom:max(14px,env(safe-area-inset-bottom));display:grid;gap:12px;z-index:5;align-content:center;justify-items:center}
+.pad{font-family:inherit;width:100%;aspect-ratio:1;max-height:100%;border-radius:50%;border:6px solid rgba(255,255,255,.85);font-size:min(10vw,5.5dvh);box-shadow:0 7px 0 rgba(0,0,0,.35),inset 0 -10px 0 rgba(0,0,0,.18);cursor:pointer;transition:transform .08s,filter .12s;filter:saturate(.75) brightness(.8);touch-action:manipulation;color:#fff}
+.pad.lit{filter:saturate(1.3) brightness(1.25);transform:scale(1.1);box-shadow:0 0 30px 8px rgba(255,255,255,.75),0 7px 0 rgba(0,0,0,.35)}
+.pad:active{transform:scale(.95)}
+#pads.off .pad{cursor:default}
+#hud{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 54px);right:12px;left:12px;display:flex;justify-content:space-between;z-index:6;pointer-events:none}
+#status{position:absolute;top:63%;left:0;right:0;text-align:center;z-index:6;color:#fff;font-weight:900;font-size:20px;text-shadow:0 2px 4px rgba(0,0,0,.5);pointer-events:none;transform:translateY(-50%)}
+#bigPop{position:absolute;left:50%;top:32%;transform:translate(-50%,-50%) scale(0);font-size:80px;z-index:7;pointer-events:none;transition:transform .2s}
+#bigPop.on{transform:translate(-50%,-50%) scale(1)}
+.zbtnScreen .logo .l2{color:#ffd23f}
+#seqDots{display:flex;gap:4px;justify-content:center;margin-top:4px}
+#seqDots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35);display:inline-block}
+#seqDots i.on{background:#ffd23f}
+.screen{z-index:20}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="spot" id="spotE"></div><div class="spot" id="spotZ"></div>
+  <div id="curtL"></div><div id="curtR"></div><div id="valance"></div>
+  <div id="stage"><img id="stageImg" src="../lib/assets/img/dec_stage.webp" alt=""><div class="char" id="ef"></div><div class="char" id="zu"></div></div>
+  <div id="crowd"></div>
+  <div id="hud"><div class="pill" id="hRound">🎵 שלב 1</div><div class="pill" id="hHearts">❤️❤️❤️</div></div>
+  <div id="status"><span id="stTxt"></span><div id="seqDots"></div></div>
+  <div id="bigPop"></div>
+  <div id="pads" class="off"></div>
+
+  <section id="scrStart" class="screen show">
+    <div style="height:56px"></div>
+    <div class="panel" style="margin-top:auto;margin-bottom:auto">
+      <div class="logo"><span class="l1">המופע הגדול</span><span class="l2">🎤 אפרתושקה וזומי בומי 🎤</span></div>
+      <p class="sub">אפרתושקה מראה ריקוד – זומי מתבלבל – ואתם מראים לו איך עושים את זה!</p>
+      <button class="btn big pink pulse" id="go">🎬 מתחילים את המופע!</button>
+    </div>
+  </section>
+  <section id="scrEnd" class="screen panelscr">
+    <div class="panel">
+      <div class="big-emoji" id="endEmoji">🏆</div>
+      <h2 id="endTitle">איזה מופע!</h2>
+      <p class="sub" id="endSub"></p>
+      <div class="starsWon" id="endStars">+0 ⭐</div>
+      <button class="btn big pink pulse" id="again">🔁 עוד מופע!</button>
+      <a class="btn mid gray" href="../hub/">🏠 לכל המשחקים</a>
+    </div>
+  </section>
+</div>
+<script src="../lib/voices.js"></script>
+<script src="../lib/zb.js"></script>
+<script src="show.js"></script>
+</body>
+</html>

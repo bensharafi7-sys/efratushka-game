@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ff5fb4">
+<title>עוד משחקים עם זומי בומי</title>
+<link rel="icon" href="../lib/assets/img/zumi_face.webp">
+<link rel="stylesheet" href="../lib/zb.css">
+<style>
+#app{overflow-y:auto;overflow-x:hidden}
+#wrap{position:relative;min-height:100%;display:flex;flex-direction:column;align-items:center;padding:calc(max(10px,env(safe-area-inset-top)) + 58px) 12px calc(max(14px,env(safe-area-inset-bottom)) + 10px);gap:10px}
+#hero{position:relative;width:100%;height:min(31dvh,260px);display:flex;justify-content:center;align-items:flex-end;gap:0}
+#hero .char{height:100%;background-repeat:no-repeat;filter:drop-shadow(0 6px 6px rgba(0,0,0,.25));cursor:pointer}
+#hero #ef{height:92%}
+#title{text-align:center}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
+.card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-decoration:none;border-radius:24px;padding:8px 8px 10px;min-height:min(23dvh,190px);box-shadow:0 6px 0 rgba(0,0,0,.2);overflow:hidden;color:#fff;font-weight:900;text-align:center;transition:transform .12s}
+.card:active{transform:scale(.96)}
+.card .art{position:absolute;inset:0;background-repeat:no-repeat;background-position:center 30%;background-size:auto 66%}
+.card .t{position:relative;font-size:clamp(17px,4.8vw,22px);text-shadow:0 2px 0 rgba(0,0,0,.25);line-height:1.1}
+.card .d{position:relative;font-size:12.5px;font-weight:700;opacity:.95;margin-top:2px}
+.card .best{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.9);color:#7a1fa2;font-size:12px;border-radius:999px;padding:2px 8px}
+.c1{background:linear-gradient(160deg,#8fd3ff,#7b2ff2)}
+.c2{background:linear-gradient(160deg,#ffd166,#ff6f91)}
+.c3{background:linear-gradient(160deg,#a66bff,#2a0f5e)}
+.c4{background:linear-gradient(160deg,#ffb3dc,#ff4fa8)}
+.emo{position:absolute;font-size:34px;filter:drop-shadow(0 3px 2px rgba(0,0,0,.2))}
+#backMain{margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="wrap">
+    <div id="hero"><div class="char" id="zu" title="זומי בומי"></div><div class="char" id="ef" title="אפרתושקה"></div></div>
+    <div class="logo" id="title"><span class="l1">עוד משחקים</span><span class="l2">עם זומי בומי 🎁</span></div>
+    <div class="cards">
+      <a class="card c1" href="../tower/" data-g="tower"><div class="art" style="background-image:url(../lib/assets/img/dec_balloon.webp);background-position:20% 18%;background-size:auto 46%"></div><span class="emo" style="top:14px;right:16px">🎁</span><span class="emo" style="top:52px;right:44px;font-size:26px">🚀</span><span class="t">מגדל ההפתעות</span><span class="d">קופצים עד החלל!</span><span class="best" data-best="tower"></span></a>
+      <a class="card c3" href="../show/" data-g="show"><div class="art" style="background-image:url(../lib/assets/img/dec_stage.webp);background-size:90% auto;background-position:center 20%"></div><span class="t">המופע הגדול</span><span class="d">חוזרים על הריקוד</span><span class="best" data-best="show"></span></a>
+      <a class="card c2" href="../surprise/" data-g="surprise"><div class="art"></div><span class="emo" style="top:18px;right:18%;font-size:46px">🎁</span><span class="emo" style="top:30px;left:16%;font-size:40px">🎁</span><span class="emo" style="top:10px;left:42%;font-size:30px">❓</span><span class="t">איפה ההפתעה?</span><span class="d">עוקבים אחרי הקופסה</span><span class="best" data-best="surprise"></span></a>
+      <a class="card c4" href="../kitchen/" data-g="kitchen"><div class="art" style="background-image:url(../lib/assets/img/dec_cake.webp);background-size:auto 62%;background-position:center 14%"></div><span class="t">מטבח המסיבה</span><span class="d">אופים עוגה מטורפת</span><span class="best" data-best="kitchen"></span></a>
+    </div>
+    <a class="btn mid purple" id="backMain" href="../../">⬅️ חזרה למשחק של אפרתושקה</a>
+  </div>
+</div>
+<script src="../lib/voices.js"></script>
+<script src="../lib/zb.js"></script>
+<script>
+(function(){ const {$,save,say,chain,sfx,pick}=ZB;
+const MAIN='https://bensharafi7-sys.github.io/efratushka-game/';
+const back=/games_staging/.test(location.pathname)||location.protocol==='file:'?MAIN:'../../';
+$('#backMain').href=back;
+ZB.topbar({back});
+const zu=ZB.domSprite($('#zu'),'z_idle',16), ef=ZB.domSprite($('#ef'),'e_dance',12);
+ZB.sprites(['z_idle','z_dance','z_lidpop','z_celebrate','e_dance','e_celebrate']);
+ZB.preload(['e_hub','z_hi','z_giggle','s_coin','s_jump']);
+const g=save.own.g||{};
+const lbl={tower:x=>x.best?'🏆 '+x.best+' קומות':'',show:x=>x.best?'🏆 '+x.best:'',surprise:x=>x.best?'🏆 '+x.best+'/5':'',kitchen:x=>x.cakes?'🎂 '+x.cakes:''};
+document.querySelectorAll('[data-best]').forEach(e=>{ const k=e.dataset.best, t=g[k]?lbl[k](g[k]):''; if(t) e.textContent=t; else e.remove(); });
+let greeted=false;
+async function greet(){ if(greeted) return; greeted=true; ZB.music('candy'); zu.playOnce('z_lidpop','z_idle',24); await say('e_hub'); zu.playOnce('z_dance','z_idle',24); await say('z_hi'); }
+document.addEventListener('pointerdown',()=>{ ZB.unlock(); greet(); },{once:true});
+$('#zu').onclick=()=>{ ZB.unlock(); if(!greeted) return; zu.playOnce(pick(['z_dance','z_lidpop','z_celebrate']),'z_idle',26); say('z_giggle'); };
+$('#ef').onclick=()=>{ ZB.unlock(); if(!greeted) return; ef.playOnce('e_celebrate','e_dance',26); say(pick(['ef_enc6','ef_enc3','ef_great'])); };
+document.querySelectorAll('.card').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); ZB.unlock(); sfx('jump'); const h=a.href; setTimeout(()=>location.href=h,160); }));
+setInterval(()=>{ if(!ZB.voiceBusy()) zu.playOnce(pick(['z_dance','z_lidpop','z_celebrate']),'z_idle',24); },7000);
+})();
+</script>
+</body>
+</html>

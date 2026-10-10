@@ -1,0 +1,44 @@
+{
+ "z_idle": {
+  "fw": 202,
+  "fh": 260,
+  "n": 48,
+  "cols": 20,
+  "file": "z_idle.webp"
+ },
+ "z_jump": {
+  "fw": 192,
+  "fh": 260,
+  "n": 48,
+  "cols": 21,
+  "file": "z_jump.webp"
+ },
+ "z_oops": {
+  "fw": 218,
+  "fh": 260,
+  "n": 48,
+  "cols": 18,
+  "file": "z_oops.webp"
+ },
+ "z_dance": {
+  "fw": 228,
+  "fh": 260,
+  "n": 48,
+  "cols": 17,
+  "file": "z_dance.webp"
+ },
+ "z_celebrate": {
+  "fw": 192,
+  "fh": 260,
+  "n": 48,
+  "cols": 21,
+  "file": "z_celebrate.webp"
+ },
+ "z_lidpop": {
+  "fw": 192,
+  "fh": 300,
+  "n": 48,
+  "cols": 21,
+  "file": "z_lidpop.webp"
+ }
+}

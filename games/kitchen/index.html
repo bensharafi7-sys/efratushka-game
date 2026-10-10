@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ff9ccf">
+<title>מטבח המסיבה – אפרתושקה וזומי בומי</title>
+<link rel="icon" href="../lib/assets/img/zumi_face.webp">
+<link rel="stylesheet" href="../lib/zb.css">
+<style>
+#app{background:linear-gradient(#ffe9f5 0%,#ffd1ec 55%,#f7b6dc 55.2%,#f3a5d1 100%)}
+#tiles{position:absolute;left:0;right:0;top:0;height:55%;background-image:linear-gradient(rgba(255,255,255,.45) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.45) 2px,transparent 2px);background-size:48px 48px;opacity:.7}
+#shelf{position:absolute;left:6%;right:6%;top:23%;height:10px;background:#c77dbb;border-radius:6px;opacity:.6}
+#cv{position:absolute;left:0;right:0;top:20%;height:52%;width:100%;z-index:3}
+.char{position:absolute;bottom:33%;height:25%;background-repeat:no-repeat;z-index:4;filter:drop-shadow(0 5px 4px rgba(0,0,0,.25));transition:transform .5s}
+#ef{right:-3%}#zu{left:-4%}
+#zu.taste{transform:translateX(45%)}
+#order{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 54px);left:10px;right:10px;z-index:6;background:#fff;border-radius:20px;padding:6px 8px;box-shadow:0 4px 0 rgba(0,0,0,.15);display:flex;align-items:center;gap:6px;min-height:58px}
+#order img{width:42px;height:42px;border-radius:50%;background:#ffe0f3;flex:none}
+#steps{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.st{min-width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;background:#f6ecfb;border:3px solid transparent;position:relative}
+.st.cur{border-color:#ff4fa8;animation:pulse 1s infinite}
+.st.done::after{content:'✔';position:absolute;bottom:-6px;left:-4px;font-size:15px;background:#5be37a;color:#fff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center}
+.st .sw{width:26px;height:20px;border-radius:6px;border:2px solid rgba(0,0,0,.15)}
+#tray{position:absolute;left:8px;right:8px;bottom:max(10px,env(safe-area-inset-bottom));height:24%;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr;gap:8px;z-index:6}
+.ing{font-family:inherit;border:0;border-radius:18px;background:#fff;box-shadow:0 5px 0 rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:13px;color:#7a1fa2;cursor:pointer;touch-action:manipulation;padding:2px}
+.ing:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.ing .ic{font-size:30px;line-height:1}
+.ing .sw{width:44px;height:26px;border-radius:9px;border:3px solid rgba(0,0,0,.12)}
+.ing.hint{outline:4px solid #ffd23f;animation:pulse 1s infinite}
+.ing.no{animation:no .3s}
+@keyframes no{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#photoBtn{position:absolute;left:50%;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 24% + 18px);transform:translateX(-50%);z-index:7}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:60;transition:opacity .5s}
+#photoImg{width:100%;max-height:44dvh;object-fit:contain;border-radius:16px;box-shadow:0 6px 0 rgba(0,0,0,.15);background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.chip{font-family:inherit;border:0;border-radius:999px;padding:7px 12px;background:#f0dcf8;color:#7a1fa2;font-weight:800;font-size:15px;cursor:pointer}
+.chip.on{background:#ff4fa8;color:#fff}
+#nameIn{font-family:inherit;font-size:17px;font-weight:800;border:3px solid #f0dcf8;border-radius:14px;padding:7px 10px;width:100%;text-align:center;color:#7a1fa2}
+.screen{z-index:20}
+#zbBubbles{bottom:auto;top:calc(max(10px,env(safe-area-inset-top)) + 122px)}
+#scrPhoto .panel{gap:8px;padding:14px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="tiles"></div><div id="shelf"></div>
+  <canvas id="cv"></canvas>
+  <div class="char" id="zu"></div><div class="char" id="ef"></div>
+  <div id="order" class="hidden"><img src="../lib/assets/img/efrat_face.webp" alt=""><div id="steps"></div></div>
+  <div id="tray"></div>
+  <button class="btn mid green hidden" id="photoBtn">📸 מצלמים!</button>
+  <div id="flash"></div>
+  <section id="scrStart" class="screen show">
+    <div class="panel" style="margin-top:auto;margin-bottom:auto">
+      <div class="logo"><span class="l1">מטבח המסיבה</span><span class="l2">🎂 אופים עם אפרתושקה וזומי 🎂</span></div>
+      <p class="sub">אפרתושקה אומרת מה לשים – ואתם בונים עוגה! רק תשגיחו שזומי לא יאכל אותה… 😋</p>
+      <button class="btn big pink pulse" id="go">👩‍🍳 בואו נאפה!</button>
+    </div>
+  </section>
+  <section id="scrPhoto" class="screen panelscr">
+    <div class="panel">
+      <h2>📸 העוגה שלכם!</h2>
+      <img id="photoImg" alt="תמונת העוגה">
+      <div class="chips" id="chips"></div>
+      <input id="nameIn" maxlength="24" placeholder="איך קוראים לעוגה?" aria-label="שם העוגה">
+      <div class="starsWon" id="kStars">+0 ⭐</div>
+      <div class="row"><button class="btn mid teal" id="share">💾 שמירה / שיתוף</button><button class="btn mid pink" id="again">🎂 עוגה חדשה</button></div>
+      <a class="btn small gray" href="../hub/">🏠 לכל המשחקים</a>
+    </div>
+  </section>
+</div>
+<script src="../lib/voices.js"></script>
+<script src="../lib/zb.js"></script>
+<script src="kitchen.js"></script>
+</body>
+</html>
