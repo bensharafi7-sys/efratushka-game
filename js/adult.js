@@ -227,8 +227,8 @@ AD.battleBg=['#07010f','#2c0a52'];
 /* ---------- menu ---------- */
 AD.menuUpd=function(){ const on=AD.on(); document.body.classList.toggle('adult',on);
   const hc=$('#hcToggle'); if(hc){ hc.classList.toggle('hidden',!on); hc.classList.toggle('on',!!S.adult.hardcore); hc.textContent=S.adult.hardcore?'⚡ הארדקור: פועל · פסילה אחת':'⚡ הארדקור: כבוי · 3 חיים'; }
-  const bp=$('#btnPlay'); if(bp) bp.textContent=on?'▶ שחקו · מבוגרים 🔥':'▶ שחקו!';
-  const at=document.querySelector('.agetitle'); if(at) at.textContent=on?'מצב מבוגרים: מהיר יותר, חידות קשות, טבלה נפרדת':'בן/בת כמה השחקן?';
+  const bp=$('#btnPlay'); if(bp) bp.textContent=on?'▶ שחקו · 15+ 🔥':'▶ שחקו!';
+  const at=document.querySelector('.agetitle'); if(at) at.textContent=on?'מצב 15+: חידות לנוער ולמבוגרים, טבלה נפרדת':'בן/בת כמה השחקן?';
 };
 if($('#hcToggle')) $('#hcToggle').addEventListener('click',()=>{ A.unlock(); S.adult.hardcore=!S.adult.hardcore; K.save(); A.sfx(S.adult.hardcore?'powerup':'coin',.5); AD.menuUpd(); K.updMenu(); });
 
@@ -258,7 +258,7 @@ AD.drawDailyCard=function(cv){ const g=cv.getContext('2d'), W=1080, H=1920; cv.w
   g.textAlign='center'; g.textBaseline='middle'; g.direction='rtl';
   const glowT=(t,y,font,c,blur)=>{ g.font=font; g.save(); g.shadowColor=c; g.shadowBlur=blur; g.fillStyle='#fff'; g.fillText(t,W/2,y); g.fillText(t,W/2,y); g.restore(); };
   g.font='900 150px Rubik, sans-serif'; glowT('אפרתושקה',170,'900 150px Rubik, sans-serif','#ff2fd0',40);
-  glowT('מסיבת הקסם · מבוגרים 🔥',290,'800 58px Rubik, sans-serif','#2ff3ff',24);
+  glowT('מסיבת הקסם · 15+ 🔥',290,'800 58px Rubik, sans-serif','#2ff3ff',24);
   g.save(); g.shadowColor='#ffe45c'; g.shadowBlur=24; g.strokeStyle='#ffe45c'; g.lineWidth=6; K.rrect(g,W/2-330,360,660,120,60); g.stroke(); g.restore();
   g.font='900 62px Rubik, sans-serif'; g.fillStyle='#ffe45c'; g.fillText('📅 אתגר יומי · '+heDate(r.date||AD.today()),W/2,422);
   const sh=K.sheet&&K.sheet('front'); if(sh){ const h=820, ww=h*sh.width/sh.height; g.save(); g.shadowColor='#ff2fd0'; g.shadowBlur=60; g.drawImage(sh,W/2-ww/2,1330-h,ww,h); g.restore(); }

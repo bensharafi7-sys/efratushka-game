@@ -400,3 +400,14 @@ body.adrun #adFx{display:block}
 .dcin canvas{height:min(72vh,150vw);width:auto;aspect-ratio:9/16;border-radius:18px;box-shadow:0 0 24px rgba(255,47,208,.5)}
 .dcbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 @media (prefers-reduced-motion:reduce){.dailybtn.pulse{animation:none}}
+/* quality pass: tactile buttons, HUD pop, result stagger */
+.chip,.ages button,.adultbtn,.dailybtn,.hctoggle,.linkbtn,.iconbtn{transition:transform .09s ease}
+.chip:active,.ages button:active,.adultbtn:active,.dailybtn:active,.hctoggle:active{transform:scale(.93)}
+.btn:active{transform:translateY(4px) scale(.98)}
+#hudStars.bump{animation:hudBump .28s cubic-bezier(.2,1.8,.4,1)}
+@keyframes hudBump{40%{transform:scale(1.18)}100%{transform:scale(1)}}
+#hud .pill{text-shadow:0 1px 0 rgba(255,255,255,.4)}
+.rstats div{animation:statIn .5s cubic-bezier(.2,1.5,.4,1) both}
+.rstats div:nth-child(2){animation-delay:.08s}.rstats div:nth-child(3){animation-delay:.16s}.rstats div:nth-child(4){animation-delay:.24s}
+@keyframes statIn{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#hudStars.bump,.rstats div{animation:none}}
