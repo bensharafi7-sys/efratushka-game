@@ -5,7 +5,7 @@ const REST=["assets/audio/music/battle.mp3", "assets/audio/music/candy.mp3", "as
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(VER).then(c=>c.addAll(CORE.map(u=>new Request(u,{cache:'reload'})))).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VER).map(k=>caches.delete(k)))).then(()=>self.clients.claim()).then(()=>{ caches.open(VER).then(c=>Promise.all(REST.map(u=>c.match(u).then(m=>m||c.add(new Request(u,{cache:'reload'})).catch(()=>{}))))); })); });
 self.addEventListener('fetch',e=>{
-  const r=e.request; if(r.method!=='GET') return; const u=new URL(r.url); if(u.origin!==location.origin) return;
+  const r=e.request; if(r.method!=='GET') return; const u=new URL(r.url); if(u.origin!==location.origin) return; if(u.pathname.startsWith(new URL('./print/',self.registration.scope).pathname)) return;
   if(r.mode==='navigate'){ const root=new URL('./',self.registration.scope).pathname; const isRoot=u.pathname===root||u.pathname===root+'index.html'; e.respondWith(fetch(r).then(res=>{ if(res.ok){ const cp=res.clone(); caches.open(VER).then(c=>c.put(isRoot?'./':r,cp)); } return res; }).catch(()=>isRoot?caches.match('./'):caches.match(r,{ignoreSearch:true}).then(m=>m||caches.match(u.pathname.endsWith('/')?u.pathname+'index.html':u.pathname)))); return; }
   const put=res=>{ if(res.ok&&res.type==='basic'){ const cp=res.clone(); caches.open(VER).then(c=>c.put(r,cp)); } return res; };
   if(!u.pathname.includes('/assets/')){ e.respondWith(fetch(r).then(put).catch(()=>caches.match(r,{ignoreSearch:true}))); return; }
