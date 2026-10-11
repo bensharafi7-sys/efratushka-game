@@ -23,7 +23,7 @@ function save(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify(S)); }catch(e
 function cleanName(n){ return String(n||'').replace(/[<>&"'`\\/{}\[\]]/g,'').replace(/\s+/g,' ').trim().slice(0,16); }
 const params=new URLSearchParams(location.search);
 let BDAY=null;
-if(params.get('mode')==='adult'&&!params.get('name')) S.age=18;
+if((params.get('mode')==='adult'||params.get('daily')==='1')&&!params.get('name')) S.age=18;
 (function(){ const n=cleanName(params.get('name')); if(n){ let a=parseInt(params.get('age'),10); if(!(a>=1&&a<=120)) a=0; BDAY={name:n,age:a}; if(a>=3&&a<=10) S.age=a; else if(a>10&&a<=15) S.age=10; else if(a>0&&a<3) S.age=3; } })();
 const DEBUG=params.has('debug');
 let V=null; // v2 extension
@@ -753,10 +753,10 @@ let finaleShown=false;
 function showResult(){
   $('#bHud').classList.add('hidden'); $('#hud').classList.add('hidden');
   const earned=R.stars; let rec;
-  if(R.adult){ const wal=Math.round(earned/4); S.stars+=wal; R.wallet=wal; const k=R.hardcore?'bestHC':'best'; rec=earned>S.adult[k]; if(rec) S.adult[k]=earned; if(!R.dead) S.adult.level++; S.adult.games++; S.games=(S.games||0)+1; if(AD) AD.onRunEnd(); }
+  if(R.adult){ const wal=Math.round(earned/4); S.stars+=wal; R.wallet=wal; const k=R.hardcore?'bestHC':'best'; if(R.daily) rec=AD.dailyEnd(R,earned); else { rec=earned>S.adult[k]; if(rec) S.adult[k]=earned; if(!R.dead) S.adult.level++; } S.adult.games++; S.games=(S.games||0)+1; if(AD) AD.onRunEnd(); }
   else { S.stars+=earned; rec=earned>S.best; if(rec) S.best=earned; S.level++; S.games=(S.games||0)+1; }
   A.setRate&&A.setRate(1); const lv=V?V.onLevelEnd(R,earned):null; save();
-  G.lastScore=earned; G.lastLevel=R.level; G.lastAdult=!!R.adult; G.lastHC=!!R.hardcore;
+  G.lastScore=earned; G.lastLevel=R.level; G.lastAdult=!!R.adult; G.lastDaily=!!R.daily; G.lastHC=!!R.hardcore;
   const stats=R.adult?[[String(earned),R.hardcore?'נקודות · הארדקור ⚡':'נקודות'],[`${R.gatesOk}/${R.gatesTotal}`,'חידות נכונות'],[R.dead?'💥 נפסלתם':B&&B.win?'ניצחון! 🏆':'הפסד','קרב ריקודים'],[`+${R.wallet}`,'⭐ לארנק']]:[[`+${earned}`,'כוכבים'],[`${R.gatesOk}/${R.gatesTotal}`,'שערי קסם'],[B&&B.win?'ניצחון! 🏆':'כמעט! 💛','קרב ריקודים'],[`×${R.bestCombo}`,'קומבו שיא']];
   const fill=el=>{ el.innerHTML=''; for(const [v,l] of stats){ const d=document.createElement('div'); const b=document.createElement('b'); b.textContent=v; if(/^[+×\d]/.test(v)) b.dir='ltr'; d.appendChild(b); d.appendChild(document.createTextNode(l)); el.appendChild(d); } };
   parts=[]; floats=[]; rainConfetti(80); A.sfx('confetti'); A.menuMusic();
@@ -764,8 +764,8 @@ function showResult(){
     finaleShown=true; G.state='finale'; fill($('#fStats')); $('#fName').textContent=BDAY.name+'!'; $('#fAge').textContent=BDAY.age?`חוגגים ${BDAY.age} 🎉`:'🎉🎈🎂'; scr('scrFinale');
     const d=A.voice('bday'); setTimeout(()=>{ if(G.state==='finale') A.voice('mazal'); },(d||5.7)*1000+400);
   } else {
-    G.state='result'; fill($('#rStats')); $('#rTitle').textContent=R.adult?(rec?'שיא חדש! 🔥':R.dead?'💥 המשחק נגמר':`שלב ${R.level} הושלם! 🔥`):rec?'שיא חדש! 🏆':`שלב ${R.level} הושלם! 🎉`; scr('scrResult');
-    $('#rNext').textContent=R.adult&&R.dead?'↻ עוד סיבוב':'לשלב הבא ▶'; $('#rChallenge').textContent=R.adult?'⚔ אתגר לחבר':'⚔ תנצחו אותי!';
+    G.state='result'; fill($('#rStats')); $('#rTitle').textContent=R.daily?(R.dailyScored?(rec?'📅 שיא יומי! 🔥':'📅 האתגר היומי הושלם'):'📅 תרגול (לא נספר)'):R.adult?(rec?'שיא חדש! 🔥':R.dead?'💥 המשחק נגמר':`שלב ${R.level} הושלם! 🔥`):rec?'שיא חדש! 🏆':`שלב ${R.level} הושלם! 🎉`; scr('scrResult');
+    $('#rNext').textContent=R.daily?'↻ תרגול חוזר':R.adult&&R.dead?'↻ עוד סיבוב':'לשלב הבא ▶'; $('#rChallenge').textContent=R.daily?'📸 כרטיס שיתוף':R.adult?'⚔ אתגר לחבר':'⚔ תנצחו אותי!';
     const rc=$('#rChal'), rg=$('#rGains'); rc.classList.add('hidden'); rg.textContent='';
     if(lv){ rg.textContent=lv.gains.join(' · '); if(lv.chal){ rc.classList.remove('hidden'); rc.textContent=lv.chal.txt; rc.classList.toggle('win',lv.chal.win); } }
     $('#rLesson').classList.toggle('hidden',!(V&&B&&B.win&&!R.adult&&V.lessonPending(R.world)));

@@ -8,9 +8,23 @@ const S=K.S, AGE=18, FAR=72;
 const AD={AGE};
 S.adult=Object.assign({level:1,best:0,bestHC:0,hardcore:false,games:0},S.adult||{});
 AD.on=()=>S.age===AGE;
-AD.cfg={speed:18.5,levelSecs:70,gate:[12,16],gateLead:.8,cols:3,obst:1.4,approach:1.0,gateSlow:.9};
-AD.ramp=.42;                                   // speed grows +42% across a level
-AD.speedFor=lv=>AD.cfg.speed+Math.min(lv-1,8)*.7;
+/* ---------- daily challenge (same seeded run for everyone, seed = Israel date) ---------- */
+S.adult.daily=Object.assign({date:'',score:0,correct:0,total:0,streak:0,last:''},S.adult.daily||{});
+const ilDate=(d)=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem'}).format(d||new Date());
+const mul32=(a)=>()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
+const hashS=(str)=>{ let h=2166136261; for(const c of str){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; };
+AD.today=()=>ilDate();
+AD.dailyPlayed=()=>S.adult.daily.date===AD.today();
+AD.wantDaily=false;
+const DLV=4;                                   // daily runs at a fixed level for everyone
+/* Normal adult = readable: starts near kids' age-10 speed, gentle ramp, run slows ~45% while a quiz gate approaches
+   (≈6s to read/answer), clear zones around gates. Difficulty comes from smart questions + gradual ramp. Hardcore keeps the raw speed. */
+const CFG_N={speed:15,levelSecs:75,gate:[14,18],gateLead:.9,cols:3,obst:1,approach:1.0,gateSlow:.55,ramp:.22,lvStep:.45};
+const CFG_HC={speed:18.5,levelSecs:70,gate:[12,16],gateLead:.8,cols:3,obst:1.4,approach:1.0,gateSlow:.9,ramp:.42,lvStep:.7};
+const isHC=()=>!!S.adult.hardcore&&!AD.wantDaily;
+Object.defineProperty(AD,'cfg',{get:()=>isHC()?CFG_HC:CFG_N});
+Object.defineProperty(AD,'ramp',{get:()=>{ const R=K.R; return (R&&R.cfg&&R.cfg.ramp)||AD.cfg.ramp; }});
+AD.speedFor=lv=>AD.cfg.speed+Math.min(lv-1,8)*AD.cfg.lvStep;
 
 /* ---------- worlds (neon club palettes) ---------- */
 const WORLDS=[
@@ -36,14 +50,18 @@ let lastCat='';
 AD.bankSize=BANK.length;
 AD.question=function(){
   if(!BANK.length) return D.makeQuestion(10);
+  const R=K.R; let it=null;
+  if(R&&R.daily){ it=BANK[R.dq[R.dqi++%R.dq.length]]; return mkQ(it); }
   let pool=BANK.filter(b=>!seen.includes(b.i)); if(pool.length<6){ seen=[]; pool=BANK.slice(); }
   const cats=CATS.filter(c=>c!==lastCat&&pool.some(b=>b.c===c)); const cat=pick(cats.length?cats:CATS); lastCat=cat;
-  const it=pick(pool.filter(b=>b.c===cat).length?pool.filter(b=>b.c===cat):pool);
+  it=pick(pool.filter(b=>b.c===cat).length?pool.filter(b=>b.c===cat):pool);
   seen.push(it.i); try{ localStorage.setItem('ef_adq_seen',JSON.stringify(seen)); }catch(e){}
-  const order=shuffle([0,1,2]); const opts=order.map(k=>({k:'adult',t:it.a[k]}));
+  return mkQ(it);
+};
+function mkQ(it){ const R=K.R, rr=R&&R.daily?R.qrng:Math.random; const order=[0,1,2]; for(let i=2;i>0;i--){ const j=Math.floor(rr()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; } const opts=order.map(k=>({k:'adult',t:it.a[k]}));
   const math=it.c==='math'&&/^[\d.,\s]+[×÷+−\-]|^\d+,/.test(it.q);
   return {prompt:it.q,voice:null,options:opts,correct:order.indexOf(0),cat:'adult_'+it.c,adult:true,id:it.i,ltr:math,eq:math&&!/\?$/.test(it.q)};
-};
+}
 /* answer card texture: dark glass + neon rim + glowing text (prerendered once per question) */
 function wrapLines(g,t,maxW){ const words=t.split(' '); const lines=[]; let cur=''; for(const w of words){ const tt=cur?cur+' '+w:w; if(g.measureText(tt).width>maxW&&cur){ lines.push(cur); cur=w; } else cur=tt; } if(cur) lines.push(cur); return lines; }
 AD.card=function(o){
@@ -66,16 +84,30 @@ AD.card=function(o){
 
 /* ---------- run hooks ---------- */
 AD.onRunStart=function(R){
-  R.adult=true; R.hardcore=!!S.adult.hardcore; R.maxLives=R.hardcore?1:3; R.lives=R.maxLives; R.mult=1; R.chain=0; R.adFlash=0; R.adShake=0; R.hits=0;
+  R.adult=true; R.daily=AD.wantDaily; AD.wantDaily=false;
+  if(R.daily){ const day=AD.today(), seed=hashS('efd|'+day); R.dayKey=day; R.seed=seed; R.rng=mul32(seed); R.qrng=mul32(seed^0x9e3779b9); R.dailyScored=!AD.dailyPlayed();
+    const qr=mul32(seed^0x51ed27); const idx=BANK.map(b=>b.i); for(let i=idx.length-1;i>0;i--){ const j=Math.floor(qr()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; }
+    const bycat={}; for(const i of idx){ (bycat[BANK[i].c]=bycat[BANK[i].c]||[]).push(i); } const cs=Object.keys(bycat).sort(); R.dq=[]; for(let k=0;R.dq.length<idx.length;k++){ const c=bycat[cs[k%cs.length]]; if(c.length) R.dq.push(c.shift()); } R.dqi=0;
+    const sp=AD.speedFor(DLV), k=sp/R.baseSpeed; R.level=DLV; R.world=AD.world(1+seed%3); R.baseSpeed=R.speed=sp; R.levelLen*=k; R.objs.length=0; R.gateTimer=CFG_N.gate[0]*.7; }
+  R.hardcore=!R.daily&&!!S.adult.hardcore; R.maxLives=R.hardcore?1:3; R.lives=R.maxLives; R.mult=1; R.chain=0; R.adFlash=0; R.adShake=0; R.hits=0;
   if(R.ix) R.ix.next=1e9;
   R.nextSpawn=Math.max(R.nextSpawn,46);       // ~2s grace before the first obstacles                        // no kid interactions (high-five / clap) in adult mode
   document.body.classList.add('adrun');
-  banner(R.hardcore?'⚡ הארדקור · פסילה אחת':'🔥 מצב מבוגרים','שלב '+R.level+' · '+R.world.name+' · '+R.maxLives+' ❤️',1900);
+  banner(R.daily?(R.dailyScored?'📅 אתגר יומי · ניסיון אחד!':'📅 תרגול · לא נספר'):R.hardcore?'⚡ הארדקור · פסילה אחת':'🔥 מצב מבוגרים',(R.daily?R.dayKey.split('-').reverse().join('.'):'שלב '+R.level)+' · '+R.world.name+' · '+R.maxLives+' ❤️',1900);
   hud(R);
 };
 AD.onRunEnd=function(){ document.body.classList.remove('adrun'); };
-AD.chunk=function(R,z,addObj,starLine,lanes){
-  const sp=11+R.speed*.26, r=Math.random(), ltypes=['low','high'];
+const gateZone=R=>!R.hardcore&&(R.gateTimer<1.6||(R.adGateEnd!=null&&R.time-R.adGateEnd<1.8));
+function calmChunk(R,z,sl,lanes){ // clear zone near gates + fewer obstacles early (normal mode only)
+  if(R.hardcore) return 0;
+  if(gateZone(R)){ sl(lanes[1],z,4); return 10; }
+  const early=Math.max(0,.5-.08*(R.level-1))*(1-Math.min(1,R.dist/(R.levelLen*.6)));
+  if(Math.random()<.12+early){ sl(lanes[0],z,5); return 11+R.speed*.3; }
+  return 0; }
+AD.chunk=function(R,z,ao,sl,lanes){ if(R.daily){ if(gateZone(R)){ sl(lanes[1],z,4); return 10; } // daily: k-th pattern is identical for everyone (gate clear-zones don't consume the seed)
+    R.dci=(R.dci||0)+1; const mr=Math.random; Math.random=mul32((R.seed^Math.imul(R.dci,0x9E3779B1))>>>0); try{ const ln=shuffle([-1,0,1]); return calmChunk(R,z,sl,ln)||chunk0(R,z,ao,sl,ln); } finally{ Math.random=mr; } } const c=calmChunk(R,z,sl,lanes); if(c) return c; return chunk0(R,z,ao,sl,lanes); };
+const chunk0=function(R,z,addObj,starLine,lanes){
+  const sp=R.hardcore?11+R.speed*.26:14+R.speed*.36, r=Math.random(), ltypes=['low','high'];
   if(r<.12){ starLine(lanes[0],z,7,true); return sp*.75; }
   if(r<.34){ addObj({k:'block',x:lanes[0],z}); addObj({k:'block',x:lanes[1],z}); starLine(lanes[2],z-3,5); return sp; }
   if(r<.50){ const t=pick(ltypes); for(const l of [-1,0,1]) addObj({k:t,x:l,z}); if(t==='low') starLine(lanes[0],z-1.7,3,true); else starLine(lanes[0],z+3,4); return sp+2; }
@@ -86,7 +118,7 @@ AD.chunk=function(R,z,addObj,starLine,lanes){
 function multOf(R){ return Math.min(5,1+Math.floor(R.combo/2)+Math.floor(R.chain/40)); }
 function setMult(R){ const m=multOf(R); if(m>R.mult){ pop('מכפיל ×'+m+'!','mult'); A.sfx('powerup',.55,1.25); } R.mult=m; hud(R); }
 AD.star=function(R,v){ R.chain+=1; if(R.chain%40===0) setMult(R); return v*R.mult; };
-AD.gate=function(R,ok,q,px,py){
+AD.gate=function(R,ok,q,px,py){ R.adGateEnd=R.time;
   if(ok){ const bonus=25*R.mult*(R.pw.double>0?2:1); R.stars+=bonus; K.floatText('+'+bonus,px,py-40,'#2ff3ff',42);
     if(R.combo>=2) pop('קומבו ×'+R.combo,'combo'); setMult(R); R.adFlash=Math.max(R.adFlash,0); }
   else { R.chain=0; R.mult=1; loseLife(R,'תשובה שגויה'); }
@@ -202,5 +234,52 @@ if($('#hcToggle')) $('#hcToggle').addEventListener('click',()=>{ A.unlock(); S.a
 
 /* ---------- share (reuses existing WhatsApp/share code) ---------- */
 AD.shareText=function(score,hc){ return '🔥 עשיתי '+score+' נקודות במצב מבוגרים'+(hc?' (הארדקור ⚡)':'')+' ב"אפרתושקה: מסיבת הקסם"! חושבים שתעברו אותי? 😏'; };
+
+/* ---------- daily challenge: result, streak, menu button, share card ---------- */
+const yday=(d)=>{ const t=new Date(d+'T12:00:00Z'); t.setUTCDate(t.getUTCDate()-1); return t.toISOString().slice(0,10); };
+const heDate=(d)=>d.split('-').reverse().join('.');
+AD.dailyEnd=function(R,earned){ const d=S.adult.daily; S.adult.games++; K.G.lastDailyRun={score:earned,correct:R.gatesOk,total:R.gatesTotal,date:R.dayKey,scored:R.dailyScored};
+  if(!R.dailyScored||d.date===R.dayKey) return false;
+  d.streak=(d.last===yday(R.dayKey))?d.streak+1:1; d.last=R.dayKey; d.date=R.dayKey; d.score=earned; d.correct=R.gatesOk; d.total=R.gatesTotal; K.save(); return true; };
+const dBtn=document.createElement('button'); dBtn.id='btnDaily'; dBtn.className='dailybtn hidden'; const hcB=$('#hcToggle'); if(hcB) hcB.insertAdjacentElement('afterend',dBtn);
+if(/[?&]daily=1/.test(location.search)) dBtn.classList.add('pulse');
+function dailyUpd(){ const on=AD.on(); dBtn.classList.toggle('hidden',!on); if(!on) return; const d=S.adult.daily, st=(d.last===AD.today()||d.last===yday(AD.today()))?d.streak:0;
+  dBtn.innerHTML=AD.dailyPlayed()?`📅 אתגר יומי · היום: <b>${d.score}</b> · תרגול ↻`+(st?` · 🔥 רצף ${st}`:''):`📅 אתגר יומי <b>חדש!</b> · ניסיון אחד`+(st?` · 🔥 רצף ${st}`:''); }
+const mu0=AD.menuUpd; AD.menuUpd=function(){ mu0(); dailyUpd(); };
+dBtn.addEventListener('click',()=>{ A.unlock(); dBtn.classList.remove('pulse'); AD.wantDaily=true; $('#btnPlay').click(); });
+// result screen: "📸 כרטיס שיתוף" opens the daily share card instead of the normal challenge
+document.addEventListener('click',(e)=>{ const b=e.target.closest&&e.target.closest('#rChallenge'); if(!b||!K.G.lastDaily) return; e.stopImmediatePropagation(); e.preventDefault(); A.unlock(); openCard(); },true);
+AD.drawDailyCard=function(cv){ const g=cv.getContext('2d'), W=1080, H=1920; cv.width=W; cv.height=H; const w=WORLDS[0], r=K.G.lastDailyRun||{}, d=S.adult.daily;
+  const sc=r.scored===false?d.score:r.score, cor=r.scored===false?d.correct:r.correct, tot=r.scored===false?d.total:r.total;
+  let gr=g.createLinearGradient(0,0,0,H); gr.addColorStop(0,'#05010f'); gr.addColorStop(.55,'#2a0b4a'); gr.addColorStop(1,'#07020f'); g.fillStyle=gr; g.fillRect(0,0,W,H);
+  const rr=mul32(hashS(r.date||'x')); g.fillStyle='#fff'; for(let i=0;i<120;i++){ g.globalAlpha=.2+rr()*.6; g.fillRect(rr()*W,rr()*H*.5,3,3); } g.globalAlpha=1;
+  const sn=sun(w.sun); g.drawImage(sn,W/2-380,560,760,760); const sk=skyline(); g.drawImage(sk,0,1040,W,250); g.drawImage(sk,-200,1060,W*1.3,230);
+  g.fillStyle='#07020f'; g.fillRect(0,1288,W,H-1288); g.strokeStyle='#ff2fd0'; g.lineWidth=3; for(let i=0;i<9;i++){ const y=1290+i*i*9; g.globalAlpha=.7-i*.06; g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke(); } g.globalAlpha=.5; for(let x=-6;x<=6;x++){ g.beginPath(); g.moveTo(W/2+x*40,1290); g.lineTo(W/2+x*260,H); g.stroke(); } g.globalAlpha=1;
+  g.textAlign='center'; g.textBaseline='middle'; g.direction='rtl';
+  const glowT=(t,y,font,c,blur)=>{ g.font=font; g.save(); g.shadowColor=c; g.shadowBlur=blur; g.fillStyle='#fff'; g.fillText(t,W/2,y); g.fillText(t,W/2,y); g.restore(); };
+  g.font='900 150px Rubik, sans-serif'; glowT('אפרתושקה',170,'900 150px Rubik, sans-serif','#ff2fd0',40);
+  glowT('מסיבת הקסם · מבוגרים 🔥',290,'800 58px Rubik, sans-serif','#2ff3ff',24);
+  g.save(); g.shadowColor='#ffe45c'; g.shadowBlur=24; g.strokeStyle='#ffe45c'; g.lineWidth=6; K.rrect(g,W/2-330,360,660,120,60); g.stroke(); g.restore();
+  g.font='900 62px Rubik, sans-serif'; g.fillStyle='#ffe45c'; g.fillText('📅 אתגר יומי · '+heDate(r.date||AD.today()),W/2,422);
+  const sh=K.sheet&&K.sheet('front'); if(sh){ const h=820, ww=h*sh.width/sh.height; g.save(); g.shadowColor='#ff2fd0'; g.shadowBlur=60; g.drawImage(sh,W/2-ww/2,1330-h,ww,h); g.restore(); }
+  // score panel
+  g.save(); g.fillStyle='rgba(12,4,32,.82)'; K.rrect(g,90,1360,900,430,50); g.fill(); g.shadowColor='#2ff3ff'; g.shadowBlur=30; g.strokeStyle='#2ff3ff'; g.lineWidth=6; K.rrect(g,90,1360,900,430,50); g.stroke(); g.restore();
+  g.font='800 50px Rubik, sans-serif'; g.fillStyle='#c9b8ff'; g.fillText('הניקוד שלי היום',W/2,1430);
+  g.direction='ltr'; glowT(String(sc||0),1550,'900 170px Rubik, sans-serif','#ff2fd0',36); g.direction='rtl';
+  g.font='800 56px Rubik, sans-serif'; g.fillStyle='#fff'; g.fillText('✅ '+(cor||0)+'/'+(tot||0)+' חידות   ·   🔥 רצף '+(d.streak||1)+(d.streak>1?' ימים':' יום'),W/2,1690);
+  g.font='900 60px Rubik, sans-serif'; g.fillStyle='#ffe45c'; g.fillText('תעברו אותי? 😏',W/2,1840-0);
+  g.font='700 34px Rubik, sans-serif'; g.fillStyle='#bfaee8'; g.direction='ltr'; g.fillText('bensharafi7-sys.github.io/efratushka-game',W/2,1890); };
+const dailyURL=()=>K.BASE_URL+'?daily=1';
+AD.dailyText=function(){ const r=K.G.lastDailyRun||{}, d=S.adult.daily; const sc=r.scored===false?d.score:r.score; return '📅 האתגר היומי של "אפרתושקה" ('+heDate(r.date||AD.today())+'): עשיתי '+(sc||0)+' נקודות'+(d.streak>1?' · רצף '+d.streak+' ימים 🔥':'')+'. אותו מסלול ואותן חידות לכולם – תעברו אותי? 😏'; };
+let cardEl=null;
+function openCard(){ if(!cardEl){ cardEl=document.createElement('div'); cardEl.id='dCard'; cardEl.className='dcard'; cardEl.innerHTML='<div class="dcin"><canvas id="dCardCv"></canvas><div class="dcbtns"><button class="btn pink" id="dcShare">📤 שתפו תמונה</button><button class="btn" id="dcWa">💬 וואטסאפ</button><button class="btn" id="dcBack">חזרה</button></div></div>'; document.body.appendChild(cardEl);
+    const blob=()=>new Promise(res=>$('#dCardCv').toBlob(b=>res(b),'image/png'));
+    const dl=(b)=>{ const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='efratushka-daily.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); K.toast&&K.toast('הכרטיס נשמר 📸'); };
+    $('#dcShare').addEventListener('click',async()=>{ A.sfx('coin',.3); const b=await blob(); if(!b) return; const f=new File([b],'efratushka-daily.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){ try{ await navigator.share({files:[f],title:'אפרתושקה – אתגר יומי',text:AD.dailyText()+' '+dailyURL()}); return; }catch(e){ if(e&&e.name==='AbortError') return; } } dl(b); });
+    $('#dcWa').addEventListener('click',()=>{ A.sfx('coin',.3); K.openWa(AD.dailyText()+' '+dailyURL()); });
+    $('#dcBack').addEventListener('click',()=>{ cardEl.classList.remove('show'); }); }
+  const cv=$('#dCardCv'); AD.drawDailyCard(cv); (document.fonts&&document.fonts.ready||Promise.resolve()).then(()=>AD.drawDailyCard(cv)); cardEl.classList.add('show'); }
+AD.openDailyCard=openCard;
 return AD;
 };

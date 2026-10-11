@@ -389,3 +389,14 @@ body.adrun #adFx{display:block}
 #adFx .vg{background:radial-gradient(ellipse 72% 62% at 50% 55%,rgba(0,0,0,0) 45%,rgba(4,0,14,.62) 100%)}
 #adFx.low .vg{display:none}
 #adFx .fl{opacity:0;background:radial-gradient(ellipse 72% 62% at 50% 55%,rgba(0,0,0,0) 40%,rgba(255,20,80,.85) 100%)}
+/* daily challenge */
+.dailybtn{display:block;margin:8px auto 0;padding:9px 16px;border-radius:999px;border:2px solid #ffe45c;background:rgba(20,6,40,.85);color:#fff;font:800 15px Rubik,sans-serif;box-shadow:0 0 14px rgba(255,228,92,.45),inset 0 0 10px rgba(255,47,208,.25);cursor:pointer}
+.dailybtn b{color:#ffe45c}
+.dailybtn.pulse{animation:dpulse 1.1s ease-in-out infinite}
+@keyframes dpulse{50%{box-shadow:0 0 26px rgba(255,228,92,.9),inset 0 0 10px rgba(255,47,208,.4);transform:scale(1.04)}}
+.dcard{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(4,0,12,.9);padding:12px}
+.dcard.show{display:flex}
+.dcin{display:flex;flex-direction:column;align-items:center;gap:10px;max-height:100%}
+.dcin canvas{height:min(72vh,150vw);width:auto;aspect-ratio:9/16;border-radius:18px;box-shadow:0 0 24px rgba(255,47,208,.5)}
+.dcbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+@media (prefers-reduced-motion:reduce){.dailybtn.pulse{animation:none}}
