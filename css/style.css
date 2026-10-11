@@ -411,3 +411,21 @@ body.adrun #adFx{display:block}
 .rstats div:nth-child(2){animation-delay:.08s}.rstats div:nth-child(3){animation-delay:.16s}.rstats div:nth-child(4){animation-delay:.24s}
 @keyframes statIn{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){#hudStars.bump,.rstats div{animation:none}}
+/* results: rank badge (stamp) + star bar + highlight button */
+.rrank{display:flex;align-items:center;gap:10px;width:100%;margin:2px 0 8px;direction:rtl}
+.rkb{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;width:86px;height:86px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c4,#ffcf3f 55%,#e08a00);box-shadow:0 0 0 4px #fff,0 0 0 7px #ff4fa8,0 6px 16px rgba(122,31,162,.35)}
+.rkb i{font-style:normal;font-size:30px;line-height:1}
+.rkb b{font-size:12px;font-weight:900;color:#7a1fa2;text-align:center;line-height:1.1;max-width:78px}
+.rkr{flex:1;min-width:0}
+.rkbar{height:14px;border-radius:999px;background:rgba(122,31,162,.15);overflow:hidden;box-shadow:inset 0 2px 3px rgba(0,0,0,.15)}
+.rkbar span{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ffcf3f,#ff4fa8);transition:width 1.1s cubic-bezier(.2,.9,.3,1)}
+.rkr small{display:block;margin-top:4px;font-weight:800;font-size:13px;color:#7a1fa2}
+.rrank.stamp .rkb{animation:stamp .55s cubic-bezier(.2,1.6,.4,1) .3s both}
+@keyframes stamp{0%{transform:scale(2.6) rotate(-25deg);opacity:0}60%{transform:scale(.88) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(-6deg);opacity:1}}
+.rrank[data-tier="4"] .rkb{background:radial-gradient(circle at 35% 30%,#ffffff,#b9f3ff 50%,#7b2ff2)}
+.hlbtn{width:100%;margin-top:6px;background:linear-gradient(90deg,#ff7a2f,#ff4fa8)}
+body.adult .rkb{box-shadow:0 0 0 3px #0b0418,0 0 0 6px #2ff3ff,0 0 22px rgba(47,243,255,.6)}
+body.adult .rkr small{color:#d9c9ff}
+body.adult .rkbar{background:rgba(255,255,255,.1)}
+body.adult .rkbar span{background:linear-gradient(90deg,#2ff3ff,#ff2fd0);box-shadow:0 0 10px #ff2fd0}
+@media (prefers-reduced-motion:reduce){.rrank.stamp .rkb{animation:none}}

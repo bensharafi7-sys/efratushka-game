@@ -39,7 +39,8 @@ AD.world=lv=>WORLDS[(lv-1)%WORLDS.length];
 
 /* ---------- quality (60fps target, degrade gracefully) ---------- */
 let ema=1/60, slowT=0, fastT=0; AD.low=/[?&]lowfx/.test(location.search);
-AD.perf=function(dt,state){ if(state!=='run'||dt<=0||dt>=.25) return; ema=ema*.95+Math.min(dt,.1)*.05;   // dt>=.25 = tab switch/hiccup, ignore; EMA smooths single spikes
+const HQ=/[?&]hq=1/.test(location.search);   // test/screenshot override: keep full quality
+AD.perf=function(dt,state){ if(HQ||state!=='run'||dt<=0||dt>=.25) return; ema=ema*.95+Math.min(dt,.1)*.05;   // dt>=.25 = tab switch/hiccup, ignore; EMA smooths single spikes
   if(ema>1/45){ slowT+=dt; fastT=0; if(slowT>2.5) AD.low=true; } else { slowT=Math.max(0,slowT-dt*.5); if(AD.low&&ema<1/58){ fastT+=dt; if(fastT>12){ AD.low=false; fastT=0; } } } };
 
 /* ---------- quiz bank ---------- */
@@ -202,7 +203,7 @@ AD.roadFx=function(ctx,w,R){ const sx=K.sx, sy=K.sy; const W=K.W; const z0=-2.4,
     ctx.globalAlpha=.9; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(xa,ya); ctx.lineTo(xb,yb); ctx.stroke(); }
   ctx.restore();
 };
-AD.starGlow=function(ctx,cx,cy,sz){ if(AD.low||!K.P.adGlow||sz<6) return; ctx.save(); ctx.globalAlpha=.6; const s=sz*2.1; ctx.drawImage(K.P.adGlow,cx-s/2,cy-s/2,s,s); ctx.restore(); };
+AD.starGlow=function(ctx,cx,cy,sz,al){ if(AD.low||!K.P.adGlow||sz<6) return; ctx.save(); ctx.globalAlpha=al||.6; const s=sz*2.1; ctx.drawImage(K.P.adGlow,cx-s/2,cy-s/2,s,s); ctx.restore(); };
 const rgC={}; function rglow(col){ if(rgC[col]) return rgC[col]; return rgC[col]=K.mk(96,96,(g)=>{ const gr=g.createRadialGradient(48,48,2,48,48,48); gr.addColorStop(0,col); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(0,0,96,96); }); }
 AD.runnerGlow=function(ctx,x,y,LW,w){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=.55; ctx.drawImage(rglow(w.glow[1]),x-LW*.7,y-LW*.18,LW*1.4,LW*.36); ctx.restore(); };
 /* post: vignette, speed lines, hit flash */
