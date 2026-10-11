@@ -710,10 +710,10 @@ V.lessonPending=w=>!X.stats.lessons[w.id];
 
 /* ----- challenge & share card ----- */
 function myName(){ return X.profile.name||(K.BDAY?K.BDAY.name:''); }
-function challengeLink(score){ const n=myName(); return K.BASE_URL+'?challenge='+score+(n?'&from='+encodeURIComponent(n):''); }
+function challengeLink(score,ad){ const n=myName(); return K.BASE_URL+'?challenge='+score+(n?'&from='+encodeURIComponent(n):'')+(ad?'&mode=adult':''); }
 V.challengeLink=challengeLink;
-async function shareChallenge(score){
-  const n=myName(); const u=challengeLink(score); const text='⚔ '+(n?n+' אספ/ה':'אספתי')+' '+score+' כוכבים באפרתושקה: מסיבת הקסם! תנצחו אותי?';
+async function shareChallenge(score,ad){
+  const n=myName(); const u=challengeLink(score,!!ad); const text=ad&&K.AD?'⚔ '+K.AD.shareText(score,ad.hc):'⚔ '+(n?n+' אספ/ה':'אספתי')+' '+score+' כוכבים באפרתושקה: מסיבת הקסם! תנצחו אותי?';
   if(navigator.share){ try{ await navigator.share({title:'תנצחו אותי! – אפרתושקה',text,url:u}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   K.openWa(text+' '+u);
 }
@@ -907,30 +907,31 @@ async function redeem(){ const raw=$('#codeIn').value.trim(); const msg=$('#code
 
 /* ---- weekly champions (pluggable backend; demo mode until configured) ---- */
 const CFG=window.EFCFG||{}; const LBLIVE=!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
-const AGEG=a=>a<=5?'3-5':a<=8?'6-8':'9-10';
+const AGEG=a=>a>=18?'adult':a<=5?'3-5':a<=8?'6-8':'9-10';
 const NA=['כוכבת','דרקון','חד-קרן','פנדה','ארנבון','חתלתול','נסיכת','גיבור','רקדנית','קוסם','ציפור','דולפין'], NB=['ורוד','אמיץ','נוצץ','מהיר','קסום','שמח','זהוב','סגול','מצחיק','רוקד','כחול','מתוק'];
 const BAD=['זונה','שרמוט','מניאק','זין','כוס','חרא','מטומטם','דפוק','אידיוט','מפגר','זבל','סתום','fuck','shit','bitch','dick','sex','porn','ass','nazi','hitler','kill'];
 function nickOk(n){ n=String(n||'').trim().replace(/\s+/g,' '); if(n.length<2||n.length>14) return [false,'2 עד 14 אותיות']; if(!/^[\u0590-\u05FFa-zA-Z \-]+$/.test(n)) return [false,'רק אותיות (בלי מספרים וסימנים)']; const l=n.toLowerCase().replace(/[\s\-]/g,''); if(BAD.some(b=>l.includes(b))) return [false,'בחרו כינוי נחמד יותר 🙂']; return [true,n]; }
 function randNick(){ return pick(NA)+' '+pick(NB); }
-function lbWeekSync(){ const wk=weekKey(); if(X3.lb.week!==wk){ X3.lb.week=wk; X3.lb.score=0; } }
+function lbWeekSync(){ const wk=weekKey(); if(X3.lb.week!==wk){ X3.lb.week=wk; X3.lb.score=0; X3.lb.scoreA=0; } if(X3.lb.scoreA==null) X3.lb.scoreA=0; if(!X3.lb.devA) X3.lb.devA=(crypto&&crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()); }
+const lbScore=g=>g==='adult'?(X3.lb.scoreA||0):X3.lb.score;
 let lbGroup=null;
 function seedRand(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
-function demoBoard(g){ const wk=weekKey(); let h=0; for(const ch of wk+g) h=(h*31+ch.charCodeAt(0))|0; const r=seedRand(h); const base={'3-5':900,'6-8':1400,'9-10':1900}[g];
+function demoBoard(g){ const wk=weekKey(); let h=0; for(const ch of wk+g) h=(h*31+ch.charCodeAt(0))|0; const r=seedRand(h); const base={'3-5':900,'6-8':1400,'9-10':1900,'adult':5200}[g];
   const list=[]; for(let i=0;i<10;i++) list.push({nick:NA[Math.floor(r()*NA.length)]+' '+NB[Math.floor(r()*NB.length)],score:Math.round(base*(1-i*.08)*(.85+r()*.3))});
-  if(X3.lb.on&&X3.lb.nick&&AGEG(S.age)===g) list.push({nick:X3.lb.nick,score:X3.lb.score,me:true}); return list.sort((a,b)=>b.score-a.score).slice(0,10); }
+  if(X3.lb.on&&X3.lb.nick&&(g==='adult'?(X3.lb.scoreA>0||AGEG(S.age)==='adult'):AGEG(S.age)===g)) list.push({nick:X3.lb.nick,score:lbScore(g),me:true}); return list.sort((a,b)=>b.score-a.score).slice(0,10); }
 async function lbFetch(g){ if(!LBLIVE) return demoBoard(g);
   const u=CFG.supabaseUrl.replace(/\/$/,'')+'/rest/v1/weekly_top?select=nick,score&week=eq.'+encodeURIComponent(weekKey())+'&age_group=eq.'+encodeURIComponent(g)+'&order=score.desc&limit=10';
   const r=await fetch(u,{headers:{apikey:CFG.supabaseAnonKey,Authorization:'Bearer '+CFG.supabaseAnonKey}}); if(!r.ok) throw new Error('lb '+r.status); const l=await r.json(); return l.map(e=>Object.assign(e,{me:X3.lb.on&&e.nick===X3.lb.nick})); }
-async function lbSubmit(){ if(!LBLIVE||!X3.lb.on||!X3.lb.nick) return; try{ await fetch(CFG.supabaseUrl.replace(/\/$/,'')+'/rest/v1/rpc/submit_score',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.supabaseAnonKey,Authorization:'Bearer '+CFG.supabaseAnonKey},body:JSON.stringify({p_device:X3.lb.dev,p_nick:X3.lb.nick,p_age_group:AGEG(S.age),p_week:weekKey(),p_score:X3.lb.score})}); }catch(e){} }
+async function lbSubmit(){ if(!LBLIVE||!X3.lb.on||!X3.lb.nick) return; const g=AGEG(S.age), ad=g==='adult'; try{ await fetch(CFG.supabaseUrl.replace(/\/$/,'')+'/rest/v1/rpc/submit_score',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.supabaseAnonKey,Authorization:'Bearer '+CFG.supabaseAnonKey},body:JSON.stringify({p_device:ad?X3.lb.devA:X3.lb.dev,p_nick:X3.lb.nick,p_age_group:g,p_week:weekKey(),p_score:lbScore(g)})}); }catch(e){} }
 function champsScreen(){ lbWeekSync(); open('scrChamps'); lbGroup=lbGroup||AGEG(S.age); renderChamps(); if(!A.voiceBusy()) A.voice('champs_week',{exact:true}); }
-async function renderChamps(){ const tabs=$('#chTabs'); tabs.innerHTML=''; ['3-5','6-8','9-10'].forEach(g=>{ const b=el('button','chip'+(g===lbGroup?' on':''),'גילאי '+g); b.addEventListener('click',()=>{ lbGroup=g; A.sfx('coin',.3); renderChamps(); }); tabs.appendChild(b); });
+async function renderChamps(){ const tabs=$('#chTabs'); tabs.innerHTML=''; ['3-5','6-8','9-10','adult'].forEach(g=>{ const b=el('button','chip'+(g===lbGroup?' on':'')+(g==='adult'?' adchip':''),g==='adult'?'מבוגרים 🔥':'גילאי '+g); b.addEventListener('click',()=>{ lbGroup=g; A.sfx('coin',.3); renderChamps(); }); tabs.appendChild(b); });
   $('#chDemo').classList.toggle('hidden',LBLIVE); const list=$('#chList'); list.innerHTML='<div class="sub">טוען…</div>';
   let rows=[]; try{ rows=await lbFetch(lbGroup); }catch(e){ list.innerHTML='<div class="sub">אין חיבור כרגע – נסו מאוחר יותר</div>'; return; }
   list.innerHTML=''; rows.forEach((e,i)=>{ const r=el('div','chrow'+(e.me?' me':'')); r.appendChild(el('b','chpos',String(i+1))); if(i<3){ const m=el('i','medal m'+i); r.appendChild(m); } r.appendChild(el('span','chnick',e.nick)); r.appendChild(el('span','chsc',e.score+' ⭐')); list.appendChild(r); });
-  const me=$('#chMe'); me.textContent=X3.lb.on?('הכינוי שלכם: '+X3.lb.nick+' · השבוע: '+X3.lb.score+' ⭐'):'רוצים להופיע בטבלה? הורה צריך לאשר ולבחור כינוי.';
+  const me=$('#chMe'); me.textContent=X3.lb.on?('הכינוי שלכם: '+X3.lb.nick+' · השבוע'+(lbGroup==='adult'?' (מבוגרים)':'')+': '+lbScore(lbGroup)+' ⭐'):'רוצים להופיע בטבלה? הורה צריך לאשר ולבחור כינוי.';
   $('#chJoin').textContent=X3.lb.on?'⚙️ שינוי כינוי / יציאה':'✨ הצטרפות לטבלה (הורים)'; }
 function joinScreen(){ open('scrNick'); $('#nkIn').value=X3.lb.nick||randNick(); $('#nkMsg').textContent=''; $('#nkLeave').classList.toggle('hidden',!X3.lb.on); }
-V.lbAdd=function(earned){ lbWeekSync(); X3.lb.score+=Math.max(0,earned|0); save(); lbSubmit(); };
+V.lbAdd=function(earned){ lbWeekSync(); if(AGEG(S.age)==='adult') X3.lb.scoreA+=Math.max(0,earned|0); else X3.lb.score+=Math.max(0,earned|0); save(); lbSubmit(); };
 const _onLevelEnd=V.onLevelEnd; V.onLevelEnd=function(R,earned){ const r=_onLevelEnd(R,earned); V.lbAdd(earned); return r; };
 
 /* ---- install as app (PWA) ---- */

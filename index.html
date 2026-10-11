@@ -69,6 +69,7 @@
       <div class="agebox">
         <div class="agetitle">בן/בת כמה השחקן?</div>
         <div class="ages" id="ages"></div>
+        <button id="hcToggle" class="hctoggle hidden"></button>
       </div>
       <div class="worlds" id="worldPick"></div>
       <button id="btnPlay" class="btn big pink">▶ שחקו!</button>
@@ -126,6 +127,8 @@
       <button class="iconbtn" id="btnPause" aria-label="הפסקה">⏸</button>
       <div class="pill" id="hudStars">⭐ 0</div>
       <div class="pill combo hidden" id="hudCombo">קומבו ×2</div>
+      <div class="pill lives hidden" id="hudLives"></div>
+      <div class="pill mult hidden" id="hudMult">×1</div>
       <div class="pill pw hidden" id="hudPower"></div>
       <div class="goldbar" id="goldBar" title="קדחת זהב"><i id="goldFill"></i></div>
     </div>
@@ -136,7 +139,9 @@
   </div>
 
   <!-- QUIZ BANNER -->
-  <div id="quiz" class="quiz hidden"><div class="qtitle">✨ שער הקסם ✨</div><div class="qtext" id="qText"></div><div class="qhint" id="qHint">רוצו לשער הנכון!</div></div>
+  <div id="quiz" class="quiz hidden"><div class="qtitle">✨ שער הקסם ✨</div><div class="qtext" id="qText"></div><div class="qhint" id="qHint">רוצו לשער הנכון!</div><div class="qtimer" id="qTimer"><i></i></div></div>
+  <div id="adBanner" class="adbanner hidden"><b></b><span></span></div>
+  <div id="adPop" class="adpop"></div>
 
   <!-- BATTLE HUD -->
   <div id="bHud" class="hidden">
@@ -426,6 +431,8 @@
 <script src="js/config.js"></script>
 <script src="js/v2.js"></script>
 <script src="js/zumi.js"></script>
+<script src="js/adult_q.js"></script>
+<script src="js/adult.js"></script>
 <script src="js/main.js"></script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{scope:'./',updateViaCache:'none'}).then(r=>{try{r.update();}catch(e){}}).catch(()=>{});let rl=false;const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{const s=document.getElementById('btnStart');if(!hadCtl||rl||(s&&s.disabled))return;rl=true;location.reload();});});}</script>
 </body>
