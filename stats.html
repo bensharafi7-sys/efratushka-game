@@ -16,13 +16,13 @@ input,select,textarea{font:inherit;padding:7px 10px;border:2px solid #e9c6ff;bor
 table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{padding:5px 6px;border-bottom:1px solid #f1def7;text-align:right;vertical-align:top}th{color:#7b2ff2;position:sticky;top:0;background:#fff}
 .scroll{max-height:380px;overflow:auto}.bar{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:13px}.bar i{display:block;height:14px;border-radius:8px;background:linear-gradient(90deg,#ff4fa8,#ffcf3f)}.bar .l{width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 svg text{font-family:Rubik,sans-serif;font-size:10px;fill:#6b4a80}.hm td{padding:0;text-align:center;font-size:10px;width:3.6%;height:20px;border:1px solid #fff}
-#login{max-width:380px;margin:12vh auto;text-align:center}#login input{width:100%;margin:10px 0;font-size:18px;text-align:center}.err{color:#c00;min-height:1.2em}
+#login{max-width:380px;margin:12vh auto;text-align:center}#login input{width:100%;margin:10px 0;font-size:18px;text-align:center}.eye{font:inherit;font-size:14px;border:2px solid #e9c6ff;background:#fff;color:#7b2ff2;border-radius:999px;padding:4px 12px;cursor:pointer;margin-bottom:8px}.err{color:#c00;min-height:1.2em}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.live{display:inline-block;width:10px;height:10px;border-radius:50%;background:#1ea94a;box-shadow:0 0 0 0 #1ea94a;animation:pl 1.6s infinite}@keyframes pl{70%{box-shadow:0 0 0 10px rgba(30,169,74,0)}}
 .muted{opacity:.65;font-size:12px}.ok{color:#1ea94a}.bad{color:#d4157f}
 </style></head><body>
 <header><h1>📊 אפרתושקה – לוח סטטיסטיקה</h1><div class="muted" style="color:#fff">פרטי · לבן ולאפרת בלבד</div></header>
 <main>
-<div id="login" class="card"><h2>כניסה עם קוד</h2><input id="code" type="tel" inputmode="numeric" autocomplete="one-time-code" name="efs-otp" placeholder="קוד בן 6 ספרות" dir="ltr"><button class="btn" id="go">כניסה</button><div class="err" id="lerr"></div></div>
+<div id="login" class="card"><h2>כניסה עם קוד</h2><input id="code" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" name="efs-otp" placeholder="קוד בן 6 ספרות" dir="ltr"><button type="button" class="eye" aria-label="הצג קוד" onclick="const i=document.getElementById('code');const s=i.type==='password';i.type=s?'text':'password';this.textContent=s?'🙈 הסתר':'👁 הצג קוד';this.setAttribute('aria-label',s?'הסתר קוד':'הצג קוד')">👁 הצג קוד</button><button class="btn" id="go">כניסה</button><div class="err" id="lerr"></div></div>
 <div id="app" hidden>
  <div class="card filters">
   <label>מ־ <input type="date" id="from"></label><label>עד <input type="date" id="to"></label>
