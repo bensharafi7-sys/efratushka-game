@@ -1,0 +1,191 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>אפרתושקה – סטטיסטיקה</title><link rel="icon" href="assets/img/ef-favicon-48.png">
+<style>
+@font-face{font-family:Rubik;src:url(assets/fonts/rubik.woff2) format("woff2");font-weight:300 900}
+*{box-sizing:border-box}body{margin:0;font-family:Rubik,system-ui,sans-serif;color:#3a1250;background:radial-gradient(circle at 50% 0,#ff8fd0 0,#a43dbd 40%,#2b0f45 100%) fixed;min-height:100vh}
+header{padding:18px 16px 6px;color:#fff;text-align:center}header h1{margin:0;font-size:28px;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+main{max-width:1200px;margin:0 auto;padding:8px 12px 40px}
+.card{background:#fff;border-radius:22px;padding:14px 16px;margin:10px 0;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.card h2{margin:0 0 8px;font-size:19px;color:#d4157f}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}.grid .card{margin:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.kpi{background:linear-gradient(#fff3fb,#ffe2f4);border-radius:16px;padding:10px;text-align:center}.kpi b{display:block;font-size:26px;color:#7b2ff2}.kpi span{font-size:12.5px}
+.btn{font-family:inherit;border:0;border-radius:999px;font-weight:800;color:#fff;cursor:pointer;padding:8px 16px;font-size:15px;background:linear-gradient(#ff6fbf,#e5168a);box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.btn.p{background:linear-gradient(#b67bff,#7b2ff2)}.btn.g{background:linear-gradient(#5be37a,#1ea94a)}.btn.s{padding:4px 10px;font-size:13px}
+input,select,textarea{font:inherit;padding:7px 10px;border:2px solid #e9c6ff;border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{padding:5px 6px;border-bottom:1px solid #f1def7;text-align:right;vertical-align:top}th{color:#7b2ff2;position:sticky;top:0;background:#fff}
+.scroll{max-height:380px;overflow:auto}.bar{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:13px}.bar i{display:block;height:14px;border-radius:8px;background:linear-gradient(90deg,#ff4fa8,#ffcf3f)}.bar .l{width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+svg text{font-family:Rubik,sans-serif;font-size:10px;fill:#6b4a80}.hm td{padding:0;text-align:center;font-size:10px;width:3.6%;height:20px;border:1px solid #fff}
+#login{max-width:380px;margin:12vh auto;text-align:center}#login input{width:100%;margin:10px 0;font-size:18px;text-align:center}.err{color:#c00;min-height:1.2em}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.live{display:inline-block;width:10px;height:10px;border-radius:50%;background:#1ea94a;box-shadow:0 0 0 0 #1ea94a;animation:pl 1.6s infinite}@keyframes pl{70%{box-shadow:0 0 0 10px rgba(30,169,74,0)}}
+.muted{opacity:.65;font-size:12px}.ok{color:#1ea94a}.bad{color:#d4157f}
+</style></head><body>
+<header><h1>📊 אפרתושקה – לוח סטטיסטיקה</h1><div class="muted" style="color:#fff">פרטי · לבן ולאפרת בלבד</div></header>
+<main>
+<div id="login" class="card"><h2>כניסה עם קוד</h2><input id="code" type="password" autocomplete="off" placeholder="קוד סודי" dir="ltr"><button class="btn" id="go">כניסה</button><div class="err" id="lerr"></div></div>
+<div id="app" hidden>
+ <div class="card filters">
+  <label>מ־ <input type="date" id="from"></label><label>עד <input type="date" id="to"></label>
+  <button class="btn s p" data-d="1">היום</button><button class="btn s p" data-d="7">7 ימים</button><button class="btn s p" data-d="30">30 ימים</button><button class="btn s p" data-d="90">90 ימים</button>
+  <select id="fmode"><option value="">כל המצבים</option><option value="kids">ילדים</option><option value="adult">מבוגרים</option></select>
+  <button class="btn s" id="reload">רענון</button><button class="btn s g" id="csvE">⬇ CSV אירועים</button><button class="btn s g" id="csvS">⬇ CSV סשנים</button><button class="btn s g" id="csvL">⬇ CSV לידים</button>
+  <span><span class="live"></span> משחקים עכשיו: <b id="now">–</b></span><span class="muted" id="upd"></span>
+ </div>
+ <div class="card"><h2>סיכום</h2><div class="kpis" id="kpis"></div></div>
+ <div class="grid">
+  <div class="card"><h2>שחקנים ביום (חדשים / חוזרים)</h2><div id="cDaily"></div></div>
+  <div class="card"><h2>משחקים ביום לפי מצב</h2><div id="cGames"></div></div>
+ </div>
+ <div class="card"><h2>מפת חום: יום × שעה (שעון ישראל)</h2><div id="heat" class="scroll"></div></div>
+ <div class="grid">
+  <div class="card"><h2>שימור (Retention)</h2><div id="ret"></div></div>
+  <div class="card"><h2>משפך: פתיחה ← התחלה ← סיום שלבים</h2><div id="funnel"></div></div>
+ </div>
+ <div class="grid">
+  <div class="card"><h2>איפה נוטשים (שלב)</h2><div id="quitL"></div></div>
+  <div class="card"><h2>איפה נוטשים (זמן בסיבוב)</h2><div id="quitT"></div></div>
+  <div class="card"><h2>שלבים מקסימליים שהגיעו אליהם</h2><div id="topLv"></div></div>
+ </div>
+ <div class="grid">
+  <div class="card"><h2>התפלגות ניקוד</h2><div id="scoreD"></div></div>
+  <div class="card"><h2>לפי מצב</h2><div id="modes"></div></div>
+ </div>
+ <div class="grid">
+  <div class="card"><h2>חנות – פריטים שנקנו</h2><div id="shop"></div></div>
+  <div class="card"><h2>שיתופים ואתגרים</h2><div id="shares"></div></div>
+ </div>
+ <div class="card"><h2>חידות – דיוק לפי שאלה (הקשות ביותר למעלה, לפחות 3 תשובות)</h2><div id="qs" class="scroll"></div></div>
+ <div class="grid">
+  <div class="card"><h2>מקורות הגעה</h2><div id="refs"></div></div><div class="card"><h2>UTM</h2><div id="utm"></div></div>
+  <div class="card"><h2>מדינה / עיר (גס)</h2><div id="geo"></div></div>
+ </div>
+ <div class="grid">
+  <div class="card"><h2>סוג מכשיר</h2><div id="dt"></div></div><div class="card"><h2>מערכת הפעלה</h2><div id="os"></div></div>
+  <div class="card"><h2>דפדפן</h2><div id="br"></div></div><div class="card"><h2>גודל מסך</h2><div id="scr"></div></div><div class="card"><h2>שפה</h2><div id="lang"></div></div>
+ </div>
+ <div class="card"><h2>סשנים אחרונים</h2><div id="sess" class="scroll"></div></div>
+ <div class="grid"><div class="card"><h2>שחקנים עם שם בטבלת האלופים</h2><div id="named" class="scroll"></div></div>
+  <div class="card"><h2>שגיאות</h2><div id="errs" class="scroll"></div></div></div>
+ <div class="card"><h2>👨‍👩‍👧 הורים שהשאירו פרטים (לידים)</h2><div id="leads" class="scroll"></div></div>
+ <div class="card"><h2>🔔 שליחת התראה (Push)</h2><div class="muted" id="pcount"></div>
+  <div class="filters"><input id="pt" maxlength="80" placeholder="כותרת" style="flex:1"><input id="pb" maxlength="200" placeholder="טקסט" style="flex:2"><input id="pu" placeholder="קישור (לא חובה)" dir="ltr" style="flex:1">
+  <select id="pm"><option value="">כולם</option><option value="kids">ילדים</option><option value="adult">מבוגרים</option></select><button class="btn" id="psend">שליחה</button></div><div id="pres" class="muted"></div></div>
+</div></main>
+<script>
+(function(){'use strict';
+const SB='https://xggvdizqwmnnsrzrkios.supabase.co',KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZ3ZkaXpxd21ubnNyenJraW9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MDEyODUsImV4cCI6MjEwNzQ3NzI4NX0.kgKbPI_kEfhWhb_tn8KvpCdTol4TooJ19VsM96axhrI',TZ='Asia/Jerusalem';
+const $=s=>document.querySelector(s), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let CODE=sessionStorage.getItem('efs_code')||'', EV=[], LEADS=[], SESS=[];
+const rpc=(fn,b)=>fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+KEY},body:JSON.stringify(b)});
+const dayK=d=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(d);
+const hm=d=>{const p=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'short',hour:'2-digit',hourCycle:'h23'}).formatToParts(d);return [['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(p.find(x=>x.type==='weekday').value),+p.find(x=>x.type==='hour').value];};
+const fmtT=d=>new Intl.DateTimeFormat('he-IL',{timeZone:TZ,day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(d);
+const dur=s=>{s=Math.round(s||0);return s<60?s+' ש׳':s<3600?Math.floor(s/60)+':'+String(s%60).padStart(2,'0')+' ד׳':(s/3600).toFixed(1)+' שע׳';};
+const cnt=(arr,f)=>{const m=new Map();for(const x of arr){const k=f(x);if(k==null||k==='')continue;m.set(k,(m.get(k)||0)+1);}return [...m].sort((a,b)=>b[1]-a[1]);};
+function bars(list,max=15,lab=x=>x){ if(!list.length) return '<div class="muted">אין נתונים</div>'; const top=list.slice(0,max), mx=Math.max(...top.map(x=>x[1]));
+  return top.map(([k,v])=>`<div class="bar"><span class="l" title="${esc(lab(k))}">${esc(lab(k))}</span><i style="width:${Math.max(2,v/mx*55)}%"></i><b>${v}</b></div>`).join(''); }
+function table(head,rows){ return `<table><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr>${rows.join('')||`<tr><td colspan=${head.length} class="muted">אין נתונים</td></tr>`}</table>`; }
+function chart(days,series,colors){ const W=560,Hh=190,pl=28,pb=26,n=days.length||1,mx=Math.max(1,...days.map((_,i)=>series.reduce((a,s)=>a+s[i],0))),bw=(W-pl-6)/n;
+  let g=`<svg viewBox="0 0 ${W} ${Hh}" width="100%">`; for(let t=0;t<=4;t++){const y=Hh-pb-(Hh-pb-8)*t/4;g+=`<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="#f1def7"/><text x="2" y="${y+3}">${Math.round(mx*t/4)}</text>`;}
+  days.forEach((d,i)=>{let y0=Hh-pb;series.forEach((s,j)=>{const h=(Hh-pb-8)*s[i]/mx;g+=`<rect x="${pl+i*bw+1}" y="${y0-h}" width="${Math.max(1,bw-2)}" height="${h}" rx="2" fill="${colors[j]}"><title>${d}: ${s[i]}</title></rect>`;y0-=h;});
+    if(n<=16||i%Math.ceil(n/12)===0) g+=`<text x="${pl+i*bw+bw/2}" y="${Hh-8}" text-anchor="middle">${d.slice(5)}</text>`;});
+  return g+'</svg>'; }
+function range(){ const f=new Date($('#from').value+'T00:00:00'), t=new Date($('#to').value+'T00:00:00'); t.setDate(t.getDate()+1); return [f,t]; }
+function setDays(n){ const t=new Date(), f=new Date(); f.setDate(f.getDate()-(n-1)); $('#from').value=dayK(f); $('#to').value=dayK(t); }
+async function load(){
+  const [f,t]=range(); $('#upd').textContent='טוען…';
+  // retention needs history: fetch 8 extra days before range start
+  const f2=new Date(f); f2.setDate(f2.getDate()-8);
+  const r=await rpc('stats_events',{p_code:CODE,p_from:f2.toISOString(),p_to:t.toISOString()});
+  if(!r.ok){ sessionStorage.removeItem('efs_code'); $('#app').hidden=true; $('#login').hidden=false; $('#lerr').textContent='קוד שגוי'; return false; }
+  const all=(await r.json()).map(e=>(e.t=new Date(e.ts),e.p=e.props||{},e));
+  const lr=await rpc('stats_leads',{p_code:CODE}); LEADS=lr.ok?await lr.json():[];
+  const pc=await rpc('stats_push_count',{p_code:CODE}); $('#pcount').textContent='מנויים להתראות: '+(pc.ok?await pc.json():'?');
+  render(all,f,t); $('#upd').textContent='עודכן '+fmtT(new Date()); return true; }
+function render(all,f,t){
+  const fm=$('#fmode').value; const inR=all.filter(e=>e.t>=f&&e.t<t); EV=inR;
+  const modeOk=e=>!fm||e.mode===fm, games=inR.filter(e=>e.type==='start'&&modeOk(e)), fins=inR.filter(e=>e.type==='finish'&&modeOk(e)), quits=inR.filter(e=>e.type==='quit'&&modeOk(e));
+  const opens=inR.filter(e=>e.type==='open'), devs=new Set(inR.map(e=>e.device));
+  // sessions
+  const S=new Map(); for(const e of inR){ let s=S.get(e.sess); if(!s){ s={sess:e.sess,device:e.device,t0:e.t,t1:e.t,dur:0,games:0,fins:0,maxLv:0,modes:new Set(),nick:null,country:e.country,city:e.city,open:null}; S.set(e.sess,s); }
+    if(e.t<s.t0) s.t0=e.t; if(e.t>s.t1) s.t1=e.t; if(e.dur_s&&(e.type==='hb'||e.type==='end')) s.dur=Math.max(s.dur,e.dur_s); if(e.type==='start'){s.games++;} if(e.type==='finish'){s.fins++; s.maxLv=Math.max(s.maxLv,e.level||0);} if(e.mode) s.modes.add(e.mode);
+    if(e.p.nick) s.nick=e.p.nick; if(e.type==='open') s.open=e.p; if(!s.country&&e.country) s.country=e.country; }
+  SESS=[...S.values()].map(s=>(s.dur=Math.max(s.dur,(s.t1-s.t0)/1000),s)).sort((a,b)=>b.t0-a.t0);
+  const sd=SESS.filter(s=>s.dur>0).map(s=>s.dur);
+  // first seen per device (from all fetched data incl. history)
+  const first=new Map(); for(const e of all){ const fs=e.type==='open'&&e.p.first?new Date(e.p.first):e.t; const c=first.get(e.device); if(!c||fs<c) first.set(e.device,fs); }
+  const newDevs=[...devs].filter(d=>first.get(d)>=f).length;
+  const nowCut=Date.now()-3*60e3, now=new Set(all.filter(e=>e.t.getTime()>nowCut&&e.type!=='end').map(e=>e.sess)); 
+  const ended=new Set(all.filter(e=>e.type==='end'&&e.t.getTime()>nowCut).map(e=>e.sess)); $('#now').textContent=[...now].filter(s=>!ended.has(s)).length;
+  const k=[[devs.size,'שחקנים ייחודיים'],[newDevs,'חדשים'],[devs.size-newDevs,'חוזרים'],[opens.length,'ביקורים'],[SESS.length,'סשנים'],[games.length,'משחקים שהתחילו'],[fins.length,'שלבים שהושלמו'],
+    [(games.length/Math.max(1,new Set(games.map(e=>e.device)).size)).toFixed(1),'משחקים לשחקן'],[dur(sd.reduce((a,b)=>a+b,0)/Math.max(1,sd.length)),'סשן ממוצע'],[dur(Math.max(0,...sd)),'הסשן הארוך'],
+    [dur(sd.reduce((a,b)=>a+b,0)),'זמן משחק כולל'],[fins.filter(e=>e.mode==='kids').reduce((a,e)=>a+(e.score||0),0),'⭐ כוכבים שנצברו (ילדים)'],
+    [inR.filter(e=>e.type==='install').length+' / '+opens.filter(e=>e.p.pwa).length,'התקנות / פתיחות כאפליקציה'],[inR.filter(e=>e.type==='share').length,'שיתופים'],[inR.filter(e=>e.type==='challenge_open').length,'קישורי אתגר נפתחו'],
+    [new Set(inR.filter(e=>e.p.nick).map(e=>e.device)).size,'שחקנים עם שם'],[LEADS.filter(l=>new Date(l.ts)>=f&&new Date(l.ts)<t).length,'לידים מהורים'],[inR.filter(e=>e.type==='error').length,'שגיאות']];
+  $('#kpis').innerHTML=k.map(([v,l])=>`<div class="kpi"><b>${esc(v)}</b><span>${l}</span></div>`).join('');
+  // daily
+  const days=[]; for(let d=new Date(f);d<t;d.setDate(d.getDate()+1)) days.push(dayK(d));
+  const dn=days.map(()=>new Set()),dr=days.map(()=>new Set()); for(const e of inR){ const i=days.indexOf(dayK(e.t)); if(i<0) continue; (dayK(first.get(e.device))===days[i]?dn:dr)[i].add(e.device); }
+  $('#cDaily').innerHTML=chart(days,[dn.map(s=>s.size),dr.map((s,i)=>[...s].filter(x=>!dn[i].has(x)).length)],['#ff4fa8','#7b2ff2'])+'<div class="muted">ורוד = חדשים · סגול = חוזרים</div>';
+  const gk=days.map(d=>games.filter(e=>e.mode==='kids'&&dayK(e.t)===d).length), ga=days.map(d=>games.filter(e=>e.mode==='adult'&&dayK(e.t)===d).length);
+  $('#cGames').innerHTML=chart(days,[gk,ga],['#ffcf3f','#0e9fb4'])+'<div class="muted">צהוב = ילדים · טורקיז = מבוגרים</div>';
+  // heatmap (by sessions start)
+  const H=[...Array(7)].map(()=>Array(24).fill(0)); for(const s of SESS){ const [w,h]=hm(s.t0); if(w>=0) H[w][h]++; } const hx=Math.max(1,...H.flat());
+  const wn=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳']; $('#heat').innerHTML='<table class="hm"><tr><th></th>'+[...Array(24).keys()].map(h=>`<th style="font-size:10px">${h}</th>`).join('')+'</tr>'+H.map((r,i)=>`<tr><th>${wn[i]}</th>`+r.map((v,h)=>`<td title="${wn[i]} ${h}:00 – ${v}" style="background:rgba(212,21,127,${v?0.12+0.88*v/hx:0.03})">${v||''}</td>`).join('')+'</tr>').join('')+'</table>';
+  // retention: cohorts by first day within fetched data
+  const act=new Map(); for(const e of all){ if(!act.has(e.device)) act.set(e.device,new Set()); act.get(e.device).add(dayK(e.t)); }
+  const addD=(k,n)=>{const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+n);return dayK(d);}; const today=dayK(new Date());
+  let c1=0,r1=0,c7=0,r7=0; const coh=new Map();
+  for(const [d,fs] of first){ if(fs<f) continue; const k0=dayK(fs), a=act.get(d)||new Set(); if(addD(k0,1)<today){c1++; if(a.has(addD(k0,1))) r1++;} if(addD(k0,7)<today){c7++; if([7,8].some(n=>a.has(addD(k0,n)))||[...a].some(x=>x>=addD(k0,7))) r7++;}
+    const c=coh.get(k0)||{n:0,d1:0,d7:0}; c.n++; if(a.has(addD(k0,1))) c.d1++; if([...a].some(x=>x>=addD(k0,7))) c.d7++; coh.set(k0,c); }
+  $('#ret').innerHTML=`<div class="kpis"><div class="kpi"><b>${c1?Math.round(r1/c1*100)+'%':'–'}</b><span>חזרו למחרת (D1) · ${r1}/${c1}</span></div><div class="kpi"><b>${c7?Math.round(r7/c7*100)+'%':'–'}</b><span>חזרו אחרי שבוע (D7+) · ${r7}/${c7}</span></div></div>`+
+    table(['יום ראשון','חדשים','D1','D7+'],[...coh].sort().reverse().slice(0,30).map(([d,c])=>`<tr><td>${d}</td><td>${c.n}</td><td>${c.d1}</td><td>${c.d7}</td></tr>`));
+  // funnel
+  const dset=a=>new Set(a.map(e=>e.device)).size, fl=[['פתחו',dset(opens)],['התחילו משחק',dset(games)]]; const mxl=Math.max(0,...fins.map(e=>e.level||0));
+  for(let l=1;l<=Math.min(mxl,15);l++) fl.push(['סיימו שלב '+l,dset(fins.filter(e=>(e.level||0)>=l))]);
+  $('#funnel').innerHTML=fl.map(([l,v],i)=>`<div class="bar"><span class="l">${l}</span><i style="width:${Math.max(2,v/Math.max(1,fl[0][1])*55)}%"></i><b>${v}</b><span class="muted">${i?Math.round(v/Math.max(1,fl[0][1])*100)+'%':''}</span></div>`).join('');
+  $('#quitL').innerHTML=bars(cnt(quits,e=>e.level).sort((a,b)=>a[0]-b[0]),30,x=>'שלב '+x)+`<div class="muted">יציאות באמצע סיבוב: ${quits.length}. נטישה = סשן שבו התחילו ולא סיימו אף שלב: ${SESS.filter(s=>s.games&&!s.fins).length}</div>`;
+  const tb=s=>s<15?'0–15 ש׳':s<30?'15–30 ש׳':s<60?'30–60 ש׳':s<120?'1–2 ד׳':s<300?'2–5 ד׳':'5+ ד׳'; const ord=['0–15 ש׳','15–30 ש׳','30–60 ש׳','1–2 ד׳','2–5 ד׳','5+ ד׳'];
+  $('#quitT').innerHTML=bars(cnt(quits,e=>tb(e.dur_s||0)).sort((a,b)=>ord.indexOf(a[0])-ord.indexOf(b[0]))) +'<div class="muted">אורך סשן כולל:</div>'+bars(cnt(SESS,s=>tb(s.dur)).sort((a,b)=>ord.indexOf(a[0])-ord.indexOf(b[0])));
+  const best=new Map(); for(const e of fins){ const k2=e.device+'|'+e.mode; best.set(k2,Math.max(best.get(k2)||0,e.level||0)); }
+  $('#topLv').innerHTML=bars(cnt([...best],([k2,v])=>v).sort((a,b)=>b[0]-a[0]),30,x=>'שלב '+x);
+  const sb=(e)=>{const v=e.score||0, st=e.mode==='adult'?250:25; const b=Math.floor(v/st)*st; return b;};
+  $('#scoreD').innerHTML=['kids','adult'].map(m=>`<b>${m==='kids'?'ילדים (כוכבים)':'מבוגרים (נקודות)'}</b>`+bars(cnt(fins.filter(e=>e.mode===m),sb).sort((a,b)=>a[0]-b[0]),40,x=>x+'+')).join('');
+  $('#modes').innerHTML=table(['מצב','שחקנים','משחקים','שלבים','ניקוד ממוצע','ניקוד מקס׳','סיבוב ממוצע','נפסלו','חידות נכונות'],['kids','adult'].map(m=>{const g=games.filter(e=>e.mode===m),fi=fins.filter(e=>e.mode===m),an=inR.filter(e=>e.type==='answer'&&e.mode===m);
+    return `<tr><td>${m==='kids'?'ילדים':'מבוגרים'}</td><td>${dset(g)}</td><td>${g.length}</td><td>${fi.length}</td><td>${Math.round(fi.reduce((a,e)=>a+(e.score||0),0)/Math.max(1,fi.length))}</td><td>${Math.max(0,...fi.map(e=>e.score||0))}</td><td>${dur(fi.reduce((a,e)=>a+(e.dur_s||0),0)/Math.max(1,fi.length))}</td><td>${fi.filter(e=>e.p.dead).length}</td><td>${an.length?Math.round(an.filter(e=>e.p.ok).length/an.length*100)+'%':'–'}</td></tr>`;}));
+  const buys=inR.filter(e=>e.type==='buy'); $('#shop').innerHTML=bars(cnt(buys,e=>e.p.item),30)+`<div class="muted">כוכבים שהוצאו: ${buys.reduce((a,e)=>a+(+e.p.cost||0),0)}</div>`;
+  $('#shares').innerHTML=bars([...cnt(inR.filter(e=>e.type==='share'),e=>e.p.what?'שיתוף '+({score:'ניקוד',challenge:'אתגר'}[e.p.what]||e.p.what):'פתיחת וואטסאפ'),['קישורי אתגר שנפתחו',inR.filter(e=>e.type==='challenge_open').length],['ביקורים מקישור יום הולדת',opens.filter(e=>e.p.bday).length],['כניסות מהתראה',opens.filter(e=>e.p.utm&&e.p.utm.source==='push').length]].filter(x=>x[1]));
+  const qm=new Map(); for(const e of inR.filter(e=>e.type==='answer'&&modeOk(e))){ const k2=(e.mode==='adult'?'🧑 ':'🧒 ')+e.p.q; const c=qm.get(k2)||{n:0,ok:0}; c.n++; if(e.p.ok) c.ok++; qm.set(k2,c); }
+  $('#qs').innerHTML=table(['שאלה','תשובות','נכון','דיוק'],[...qm].filter(([,c])=>c.n>=3).sort((a,b)=>a[1].ok/a[1].n-b[1].ok/b[1].n).slice(0,300).map(([q,c])=>`<tr><td>${esc(q)}</td><td>${c.n}</td><td>${c.ok}</td><td class="${c.ok/c.n<.5?'bad':'ok'}">${Math.round(c.ok/c.n*100)}%</td></tr>`))+`<div class="muted">סה״כ שאלות שונות: ${qm.size}</div>`;
+  const refName=r=>!r?'ישיר / אפליקציה':/whatsapp|wa\.me/.test(r)?'WhatsApp':/facebook|fb\./.test(r)?'Facebook':/instagram/.test(r)?'Instagram':/tiktok/.test(r)?'TikTok':/google/.test(r)?'Google':r;
+  $('#refs').innerHTML=bars(cnt(opens,e=>e.p.utm&&e.p.utm.source==='push'?'התראת Push':refName(e.p.ref)))+'<div class="muted">וואטסאפ בדרך כלל לא שולח referrer, ולכן קישורים משם נספרים לרוב כ"ישיר". מומלץ לשתף עם ?utm_source=whatsapp.</div>';
+  $('#utm').innerHTML=bars(cnt(opens.filter(e=>e.p.utm&&Object.keys(e.p.utm).length),e=>[e.p.utm.source,e.p.utm.medium,e.p.utm.campaign].filter(Boolean).join(' / ')));
+  $('#geo').innerHTML=bars(cnt(opens,e=>e.country||'?'))+bars(cnt(opens.filter(e=>e.city),e=>e.city));
+  const o1=SESS.filter(s=>s.open).map(s=>s.open);
+  $('#dt').innerHTML=bars(cnt(o1,p=>({mobile:'📱 נייד',tablet:'📲 טאבלט',desktop:'💻 מחשב'}[p.dt]||p.dt))); $('#os').innerHTML=bars(cnt(o1,p=>p.os)); $('#br').innerHTML=bars(cnt(o1,p=>p.br));
+  $('#scr').innerHTML=bars(cnt(o1,p=>p.sw&&(Math.min(p.sw,p.sh)+'×'+Math.max(p.sw,p.sh)))); $('#lang').innerHTML=bars(cnt(o1,p=>p.lang));
+  $('#sess').innerHTML=table(['התחלה','שחקן','שם','מצב','משחקים','שלבים','שלב מקס׳','משך','מכשיר','מקור','מיקום'],SESS.slice(0,300).map(s=>{const o=s.open||{};return `<tr><td>${fmtT(s.t0)}</td><td title="${s.device}">${s.device.slice(0,6)}${first.get(s.device)>=s.t0-6e4?' 🆕':''}</td><td>${esc(s.nick||'')}</td><td>${[...s.modes].map(m=>m==='kids'?'ילדים':'מבוגרים').join(', ')}</td><td>${s.games}</td><td>${s.fins}</td><td>${s.maxLv||''}</td><td>${dur(s.dur)}</td><td>${esc([o.dt,o.os,o.br].filter(Boolean).join(' · '))}</td><td>${esc(refName(o.ref))}${o.ch?' ⚔':''}</td><td>${esc([s.city,s.country].filter(Boolean).join(', '))}</td></tr>`;}));
+  const nm=new Map(); for(const e of inR.filter(e=>e.p.nick)){ const c=nm.get(e.p.nick+'|'+e.device)||{nick:e.p.nick,last:e.t,g:0,best:0}; if(e.t>c.last) c.last=e.t; if(e.type==='finish'){c.g++; c.best=Math.max(c.best,e.level||0);} nm.set(e.p.nick+'|'+e.device,c); }
+  $('#named').innerHTML=table(['שם','נראה לאחרונה','שלבים','שלב מקס׳'],[...nm.values()].sort((a,b)=>b.last-a.last).map(c=>`<tr><td>${esc(c.nick)}</td><td>${fmtT(c.last)}</td><td>${c.g}</td><td>${c.best||''}</td></tr>`));
+  $('#errs').innerHTML=table(['הודעה','קובץ','פעמים'],cnt(inR.filter(e=>e.type==='error'),e=>e.p.m+'¦'+(e.p.f||'')+(e.p.l?':'+e.p.l:'')).map(([k2,v])=>{const [m,fl2]=k2.split('¦');return `<tr><td>${esc(m)}</td><td>${esc(fl2)}</td><td>${v}</td></tr>`;}));
+  $('#leads').innerHTML=table(['תאריך','שם','טלפון','מקור',''],LEADS.map(l=>{const ph=String(l.phone).replace(/\D/g,''), intl=ph.startsWith('0')?'972'+ph.slice(1):ph;
+    return `<tr><td>${fmtT(new Date(l.ts))}</td><td>${esc(l.name)}</td><td dir="ltr">${esc(l.phone)}</td><td>${esc(l.src||'')}</td><td><a class="btn s g" target="_blank" rel="noopener" href="https://wa.me/${intl}?text=${encodeURIComponent('היי '+l.name+', כאן אפרתושקה 🎉 תודה שנרשמת להטבות! ')}">WhatsApp</a></td></tr>`;}))+'<div class="muted">כל ההורים סימנו אישור מפורש. לבקשת הסרה – ניתן למחוק ב-Supabase.</div>';
+}
+function csv(rows,name){ const c=rows.map(r=>r.map(v=>{v=v==null?'':typeof v==='object'?JSON.stringify(v):String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+c],{type:'text/csv'})); a.download=name; a.click(); }
+$('#csvE').onclick=()=>csv([['ts','device','session','type','mode','level','score','dur_s','country','city','props']].concat(EV.map(e=>[e.ts,e.device,e.sess,e.type,e.mode,e.level,e.score,e.dur_s,e.country,e.city,e.props])),'efratushka-events.csv');
+$('#csvS').onclick=()=>csv([['start','device','nick','modes','games','levels','max_level','dur_s','device_type','os','browser','ref','country','city']].concat(SESS.map(s=>[s.t0.toISOString(),s.device,s.nick,[...s.modes].join('|'),s.games,s.fins,s.maxLv,Math.round(s.dur),(s.open||{}).dt,(s.open||{}).os,(s.open||{}).br,(s.open||{}).ref,s.country,s.city])),'efratushka-sessions.csv');
+$('#csvL').onclick=()=>csv([['ts','name','phone','source']].concat(LEADS.map(l=>[l.ts,l.name,l.phone,l.src])),'efratushka-leads.csv');
+$('#psend').onclick=async()=>{ const b={code:CODE,title:$('#pt').value.trim(),body:$('#pb').value.trim(),url:$('#pu').value.trim()||undefined,mode:$('#pm').value||undefined}; if(!b.title){ $('#pres').textContent='צריך כותרת'; return; }
+  if(!confirm('לשלוח את ההתראה לכל המנויים?')) return; $('#pres').textContent='שולח…';
+  const r=await fetch(SB+'/functions/v1/send-push',{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+KEY},body:JSON.stringify(b)}); const j=await r.json().catch(()=>({}));
+  $('#pres').textContent=r.ok?`נשלח ל-${j.sent} מתוך ${j.total} (הוסרו ${j.gone}, נכשלו ${j.fail})`:'שגיאה: '+(j.error||r.status); };
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ setDays(+b.dataset.d); load(); });
+$('#reload').onclick=load; $('#from').onchange=$('#to').onchange=$('#fmode').onchange=load;
+async function login(){ CODE=$('#code').value.trim()||CODE; $('#lerr').textContent='בודק…'; setDays(30);
+  const r=await rpc('stats_ok',{p_code:CODE}); const ok=r.ok&&await r.json(); if(!ok){ await new Promise(x=>setTimeout(x,800)); $('#lerr').textContent='קוד שגוי'; return; }
+  sessionStorage.setItem('efs_code',CODE); $('#login').hidden=true; $('#app').hidden=false; await load(); setInterval(()=>{ if(document.visibilityState==='visible') load(); },120000); }
+$('#go').onclick=login; $('#code').onkeydown=e=>{ if(e.key==='Enter') login(); };
+if(CODE) login();
+})();
+</script></body></html>

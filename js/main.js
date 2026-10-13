@@ -314,6 +314,7 @@ function showQuiz(preHtml,q){
 function hideQuiz(){ $('#quiz').classList.add('hidden'); }
 function resolveGate(){
   const g=R.gate; const lane=Math.round(R.p.x)+1; const ok=lane===g.q.correct;
+  try{ window.EFT&&EFT('answer',{mode:R.adult?'adult':'kids',level:R.level,p:{q:String(g.q.eq?g.q.prompt+' =':g.q.prompt).slice(0,80),ok,k:g.q.kind||g.q.type||null}}); }catch(e){}
   const px=sx(R.p.x,0), py=BASE-LW*2;
   const perfect=ok&&R.time-(R.laneT||0)>1.1&&Math.abs(R.p.x-R.p.lane)<.06;
   if(ok&&(R.combo>=2||perfect)) R.burst=1.3;
@@ -758,6 +759,7 @@ function buildAges(el,onPick,withNone){
   if(!withNone){ const b=document.createElement('button'); b.className='adultbtn'; b.textContent='15+ 🔥'; b.dataset.age=18; b.addEventListener('click',()=>{ onPick(18,b); A.sfx('powerup',.5,1.1); }); el.appendChild(b); }
 }
 function goMenu(){
+  try{ if(R&&(G.state==='run'||G.state==='battle'||G.state==='pause'||G.paused)) window.EFT&&EFT('quit',{mode:R.adult?'adult':'kids',level:R.level,score:R.stars,dur:Math.round(R.time||0),p:{st:G.state}}); }catch(e){}
   G.state='menu'; G.paused=false; if(JU&&R) JU.hlStop(true); R=null; B=null; parts=[]; floats=[]; if(AD) AD.onRunEnd();
   ['#hud','#bHud','#quiz'].forEach(s=>$(s).classList.add('hidden')); scr('scrMenu'); updMenu(); A.menuMusic(); A.setRate&&A.setRate(1);
   setTimeout(checkDaily,700); if(V) V.onMenu();
@@ -772,7 +774,7 @@ function checkDaily(){
 }
 function play(){
   if(V&&!V.canPlay()) return;
-  scr(null); newRun(); G.state='run'; G.slow=0; if(JU) JU.hlStart(); G.paused=false; parts=[]; floats=[];
+  scr(null); newRun(); try{window.EFT&&EFT('start',{mode:R.adult?'adult':'kids',level:R.level,p:{age:S.age,daily:!!R.daily,hc:!!R.hardcore,bday:!!BDAY}});}catch(e){} G.state='run'; G.slow=0; if(JU) JU.hlStart(); G.paused=false; parts=[]; floats=[];
   $('#hud').classList.remove('hidden'); $('#bHud').classList.add('hidden'); updHud();
   const bt=$('#bdayTag'); if(BDAY){ bt.classList.remove('hidden'); bt.textContent='🎂 המסיבה של '+BDAY.name; } else bt.classList.add('hidden');
   A.gameMusic(R.world.music); setTimeout(()=>{ if(G.state==='run') A.voice('letsgo'); },350);
@@ -784,6 +786,7 @@ function showResult(){
   const earned=R.stars; let rec;
   if(R.adult){ const wal=Math.round(earned/4); S.stars+=wal; R.wallet=wal; const k=R.hardcore?'bestHC':'best'; if(R.daily) rec=AD.dailyEnd(R,earned); else { rec=earned>S.adult[k]; if(rec) S.adult[k]=earned; if(!R.dead) S.adult.level++; } S.adult.games++; S.games=(S.games||0)+1; if(AD) AD.onRunEnd(); }
   else { S.stars+=earned; rec=earned>S.best; if(rec) S.best=earned; S.level++; S.games=(S.games||0)+1; }
+  try{window.EFT&&EFT('finish',{mode:R.adult?'adult':'kids',level:R.level,score:earned,dur:Math.round(R.time||0),p:{dead:!!R.dead,ok:R.gatesOk,tot:R.gatesTotal,combo:R.bestCombo,battle:B?(B.win?'win':'lose'):null,daily:!!R.daily,stars:S.stars}});}catch(e){}
   A.setRate&&A.setRate(1); const lv=V?V.onLevelEnd(R,earned):null; save();
   G.lastScore=earned; G.lastLevel=R.level; G.lastAdult=!!R.adult; G.lastDaily=!!R.daily; G.lastHC=!!R.hardcore;
   const stats=R.adult?[[String(earned),R.hardcore?'נקודות · הארדקור ⚡':'נקודות'],[`${R.gatesOk}/${R.gatesTotal}`,'חידות נכונות'],[R.dead?'💥 נפסלתם':B&&B.win?'ניצחון! 🏆':'הפסד','קרב ריקודים'],[`+${R.wallet}`,'⭐ לארנק']]:[[`+${earned}`,'כוכבים'],[`${R.gatesOk}/${R.gatesTotal}`,'שערי קסם'],[B&&B.win?'ניצחון! 🏆':'כמעט! 💛','קרב ריקודים'],[`×${R.bestCombo}`,'קומבו שיא']];
@@ -807,9 +810,9 @@ function showResult(){
 }
 const BASE_URL=location.origin+location.pathname;
 function bdayLink(name,age){ return BASE_URL+'?name='+encodeURIComponent(name)+(age?'&age='+age:''); }
-function openWa(text){ window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener'); }
+function openWa(text){ try{window.EFT&&EFT('share',{p:{via:'wa'}});}catch(e){} window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener'); }
 async function copyText(t){ try{ await navigator.clipboard.writeText(t); toast('הקישור הועתק! 📋'); }catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toast('הקישור הועתק! 📋'); }catch(e2){ toast('לא הצלחנו להעתיק'); } ta.remove(); } }
-async function shareScore(){
+async function shareScore(){ try{window.EFT&&EFT('share',{p:{what:'score'}});}catch(e){}
   const text=G.lastAdult&&AD?AD.shareText(G.lastScore,G.lastHC)+' בואו לשחק:':`🎉 אספתי ${G.lastScore} כוכבים בשלב ${G.lastLevel} במשחק "אפרתושקה: מסיבת הקסם"! בואו לשחק איתי:`;
   if(navigator.share){ try{ await navigator.share({title:'אפרתושקה: מסיבת הקסם',text,url:BASE_URL}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   openWa(text+' '+BASE_URL);

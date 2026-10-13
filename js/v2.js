@@ -490,11 +490,11 @@ function renderShop(){
   const box=$('#shopList'); box.innerHTML='';
   if(shopTab==='upg'){ UPG.forEach(u=>{ const lv=X.upg[u.id]||0; const c=el('div','scard'); const ic=K.P['pw_'+u.id]; if(ic) c.appendChild(imgEl(ic.toDataURL()));
       const mid=el('div','smid'); mid.appendChild(el('b',null,u.name)); const dots=el('div','dots'); for(let i=0;i<5;i++) dots.appendChild(el('i',i<lv?'on':'')); mid.appendChild(dots); mid.appendChild(el('small',null,'משך: '+upDur(u.id).toFixed(1)+' שניות')); c.appendChild(mid);
-      const b=el('button','btn mid '+(lv>=5?'gray':'pink'),lv>=5?'מקסימום':'⭐ '+UPCOST[lv]); b.id='up_'+u.id; b.addEventListener('click',()=>{ if(lv>=5) return; const cost=UPCOST[lv]; if(S.stars<cost){ K.toast('צריך עוד '+(cost-S.stars)+' ⭐'); A.sfx('wrong',.4); return; } S.stars-=cost; X.upg[u.id]=lv+1; save(); A.voice('upgrade'); A.sfx('powerup',.7); K.confetti(K.W/2,K.H*.4,40); renderShop(); K.updMenu(); }); c.appendChild(b); box.appendChild(c); }); }
+      const b=el('button','btn mid '+(lv>=5?'gray':'pink'),lv>=5?'מקסימום':'⭐ '+UPCOST[lv]); b.id='up_'+u.id; b.addEventListener('click',()=>{ if(lv>=5) return; const cost=UPCOST[lv]; if(S.stars<cost){ K.toast('צריך עוד '+(cost-S.stars)+' ⭐'); A.sfx('wrong',.4); return; } S.stars-=cost; X.upg[u.id]=lv+1; try{window.EFT&&EFT('buy',{p:{item:'upg_'+u.id+'_'+(lv+1),cost}});}catch(e){} save(); A.voice('upgrade'); A.sfx('powerup',.7); K.confetti(K.W/2,K.H*.4,40); renderShop(); K.updMenu(); }); c.appendChild(b); box.appendChild(c); }); }
   else { VEH.forEach(v=>{ const own=X.veh.owned.includes(v.id), sel=X.veh.sel===v.id; const c=el('div','scard'+(sel?' sel':'')); c.appendChild(imgEl(vehIconURL(v.id)));
       const mid=el('div','smid'); mid.appendChild(el('b',null,v.name)); mid.appendChild(el('small',null,'מציל מהתנגשות אחת · 12 שניות')); c.appendChild(mid);
       const b=el('button','btn mid '+(sel?'green':own?'purple':'pink'),sel?'✔ נבחר':own?'בחירה':(v.price+' ⭐')); b.id='veh_'+v.id;
-      b.addEventListener('click',()=>{ if(!own){ if(S.stars<v.price){ K.toast('צריך עוד '+(v.price-S.stars)+' ⭐ (או במסע הכוכבים)'); A.sfx('wrong',.4); return; } S.stars-=v.price; X.veh.owned.push(v.id); A.voice('vehicle'); K.confetti(K.W/2,K.H*.4,40); } X.veh.sel=v.id; save(); A.sfx('coin',.4,1.2); renderShop(); K.updMenu(); }); c.appendChild(b); box.appendChild(c); });
+      b.addEventListener('click',()=>{ if(!own){ if(S.stars<v.price){ K.toast('צריך עוד '+(v.price-S.stars)+' ⭐ (או במסע הכוכבים)'); A.sfx('wrong',.4); return; } S.stars-=v.price; X.veh.owned.push(v.id); try{window.EFT&&EFT('buy',{p:{item:'veh_'+v.id,cost:v.price}});}catch(e){} A.voice('vehicle'); K.confetti(K.W/2,K.H*.4,40); } X.veh.sel=v.id; save(); A.sfx('coin',.4,1.2); renderShop(); K.updMenu(); }); c.appendChild(b); box.appendChild(c); });
     box.appendChild(el('p','sub','במשחק: הקישו פעמיים על המסך (או על כפתור הרכב) כדי לרכוב!')); }
 }
 document.querySelectorAll('.stab').forEach(t=>t.addEventListener('click',()=>{ shopTab=t.dataset.s; A.sfx('coin',.3,1.2); renderShop(); }));
@@ -712,7 +712,7 @@ V.lessonPending=w=>!X.stats.lessons[w.id];
 function myName(){ return X.profile.name||(K.BDAY?K.BDAY.name:''); }
 function challengeLink(score,ad){ const n=myName(); return K.BASE_URL+'?challenge='+score+(n?'&from='+encodeURIComponent(n):'')+(ad?'&mode=adult':''); }
 V.challengeLink=challengeLink;
-async function shareChallenge(score,ad){
+async function shareChallenge(score,ad){ try{window.EFT&&EFT('share',{p:{what:'challenge'}});}catch(e){}
   const n=myName(); const u=challengeLink(score,!!ad); const text=ad&&K.AD?'⚔ '+K.AD.shareText(score,ad.hc):'⚔ '+(n?n+' אספ/ה':'אספתי')+' '+score+' כוכבים באפרתושקה: מסיבת הקסם! תנצחו אותי?';
   if(navigator.share){ try{ await navigator.share({title:'תנצחו אותי! – אפרתושקה',text,url:u}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   K.openWa(text+' '+u);
@@ -922,8 +922,8 @@ function demoBoard(g){ const wk=weekKey(); let h=0; for(const ch of wk+g) h=(h*3
 async function lbFetch(g){ if(!LBLIVE) return demoBoard(g);
   const u=CFG.supabaseUrl.replace(/\/$/,'')+'/rest/v1/weekly_top?select=nick,score&week=eq.'+encodeURIComponent(weekKey())+'&age_group=eq.'+encodeURIComponent(g)+'&order=score.desc&limit=10';
   const r=await fetch(u,{headers:{apikey:CFG.supabaseAnonKey,Authorization:'Bearer '+CFG.supabaseAnonKey}}); if(!r.ok) throw new Error('lb '+r.status); const l=await r.json(); return l.map(e=>Object.assign(e,{me:X3.lb.on&&e.nick===X3.lb.nick})); }
-async function lbSubmit(){ if(!LBLIVE||!X3.lb.on||!X3.lb.nick) return; const g=AGEG(S.age), ad=g==='adult'; try{ await fetch(CFG.supabaseUrl.replace(/\/$/,'')+'/rest/v1/rpc/submit_score',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.supabaseAnonKey,Authorization:'Bearer '+CFG.supabaseAnonKey},body:JSON.stringify({p_device:ad?X3.lb.devA:X3.lb.dev,p_nick:X3.lb.nick,p_age_group:g,p_week:weekKey(),p_score:lbScore(g)})}); }catch(e){} }
-function champsScreen(){ lbWeekSync(); open('scrChamps'); lbGroup=lbGroup||AGEG(S.age); renderChamps(); if(!A.voiceBusy()) A.voice('champs_week',{exact:true}); }
+async function lbSubmit(){ try{ if(X3.lb.on&&X3.lb.nick&&window.EFT) EFT.nick(X3.lb.nick); }catch(e){} if(!LBLIVE||!X3.lb.on||!X3.lb.nick) return; const g=AGEG(S.age), ad=g==='adult'; try{ await fetch(CFG.supabaseUrl.replace(/\/$/,'')+'/rest/v1/rpc/submit_score',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.supabaseAnonKey,Authorization:'Bearer '+CFG.supabaseAnonKey},body:JSON.stringify({p_device:ad?X3.lb.devA:X3.lb.dev,p_nick:X3.lb.nick,p_age_group:g,p_week:weekKey(),p_score:lbScore(g)})}); }catch(e){} }
+function champsScreen(){ lbWeekSync(); open('scrChamps'); try{window.EFT&&EFT('champs');window.EFT&&EFT.leadSoft('champs');}catch(e){} lbGroup=lbGroup||AGEG(S.age); renderChamps(); if(!A.voiceBusy()) A.voice('champs_week',{exact:true}); }
 async function renderChamps(){ const tabs=$('#chTabs'); tabs.innerHTML=''; ['3-5','6-8','9-10','adult'].forEach(g=>{ const b=el('button','chip'+(g===lbGroup?' on':'')+(g==='adult'?' adchip':''),g==='adult'?'15+ 🔥':'גילאי '+g); b.addEventListener('click',()=>{ lbGroup=g; A.sfx('coin',.3); renderChamps(); }); tabs.appendChild(b); });
   $('#chDemo').classList.toggle('hidden',LBLIVE); const list=$('#chList'); list.innerHTML='<div class="sub">טוען…</div>';
   let rows=[]; try{ rows=await lbFetch(lbGroup); }catch(e){ list.innerHTML='<div class="sub">אין חיבור כרגע – נסו מאוחר יותר</div>'; return; }
