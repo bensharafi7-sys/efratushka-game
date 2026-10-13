@@ -22,7 +22,7 @@ svg text{font-family:Rubik,sans-serif;font-size:10px;fill:#6b4a80}.hm td{padding
 </style></head><body>
 <header><h1>📊 אפרתושקה – לוח סטטיסטיקה</h1><div class="muted" style="color:#fff">פרטי · לבן ולאפרת בלבד</div></header>
 <main>
-<div id="login" class="card"><h2>כניסה עם קוד</h2><input id="code" type="password" autocomplete="off" placeholder="קוד סודי" dir="ltr"><button class="btn" id="go">כניסה</button><div class="err" id="lerr"></div></div>
+<div id="login" class="card"><h2>כניסה עם קוד</h2><input id="code" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="קוד בן 6 ספרות" dir="ltr"><button class="btn" id="go">כניסה</button><div class="err" id="lerr"></div></div>
 <div id="app" hidden>
  <div class="card filters">
   <label>מ־ <input type="date" id="from"></label><label>עד <input type="date" id="to"></label>
@@ -97,10 +97,11 @@ async function load(){
   // retention needs history: fetch 8 extra days before range start
   const f2=new Date(f); f2.setDate(f2.getDate()-8);
   const r=await rpc('stats_events',{p_code:CODE,p_from:f2.toISOString(),p_to:t.toISOString()});
-  if(!r.ok){ sessionStorage.removeItem('efs_code'); $('#app').hidden=true; $('#login').hidden=false; $('#lerr').textContent='קוד שגוי'; return false; }
-  const all=(await r.json()).map(e=>(e.t=new Date(e.ts),e.p=e.props||{},e));
-  const lr=await rpc('stats_leads',{p_code:CODE}); LEADS=lr.ok?await lr.json():[];
-  const pc=await rpc('stats_push_count',{p_code:CODE}); $('#pcount').textContent='מנויים להתראות: '+(pc.ok?await pc.json():'?');
+  const rj=r.ok?await r.json():{error:'bad'};
+  if(rj.error){ sessionStorage.removeItem('efs_code'); $('#app').hidden=true; $('#login').hidden=false; $('#lerr').textContent=rj.error==='locked'?'יותר מדי ניסיונות. נסו שוב בעוד 15 דקות':'קוד שגוי'; return false; }
+  const all=rj.rows.map(e=>(e.t=new Date(e.ts),e.p=e.props||{},e));
+  const lr=await rpc('stats_leads',{p_code:CODE}); const lj=lr.ok?await lr.json():{}; LEADS=lj.rows||[];
+  const pc=await rpc('stats_push_count',{p_code:CODE}); const pj=pc.ok?await pc.json():{}; $('#pcount').textContent='מנויים להתראות: '+(pj.count!=null?pj.count:'?');
   render(all,f,t); $('#upd').textContent='עודכן '+fmtT(new Date()); return true; }
 function render(all,f,t){
   const fm=$('#fmode').value; const inR=all.filter(e=>e.t>=f&&e.t<t); EV=inR;
@@ -183,7 +184,7 @@ $('#psend').onclick=async()=>{ const b={code:CODE,title:$('#pt').value.trim(),bo
 document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ setDays(+b.dataset.d); load(); });
 $('#reload').onclick=load; $('#from').onchange=$('#to').onchange=$('#fmode').onchange=load;
 async function login(){ CODE=$('#code').value.trim()||CODE; $('#lerr').textContent='בודק…'; setDays(30);
-  const r=await rpc('stats_ok',{p_code:CODE}); const ok=r.ok&&await r.json(); if(!ok){ await new Promise(x=>setTimeout(x,800)); $('#lerr').textContent='קוד שגוי'; return; }
+  const r=await rpc('stats_ok',{p_code:CODE}); const j=r.ok?await r.json():{}; if(!j.ok){ await new Promise(x=>setTimeout(x,800)); $('#lerr').textContent=j.error==='locked'?'יותר מדי ניסיונות. נסו שוב בעוד 15 דקות':'קוד שגוי'; return; }
   sessionStorage.setItem('efs_code',CODE); $('#login').hidden=true; $('#app').hidden=false; await load(); setInterval(()=>{ if(document.visibilityState==='visible') load(); },120000); }
 $('#go').onclick=login; $('#code').onkeydown=e=>{ if(e.key==='Enter') login(); };
 if(CODE) login();
